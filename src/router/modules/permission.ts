@@ -11,6 +11,14 @@ export default {
       meta: {
         title: "权限管理"
       }
-    }
+    },
+    {
+      path: "/permission/role",
+      name: "PermissionRole",
+      component: () => import("@/views/permission/manage/index.vue"),
+      meta: {
+        title: "角色管理"
+      }
+    },
   ]
 };
