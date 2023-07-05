@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { listPermission } from "./index";
+import { listPermission, deletePermissionById } from "./index";
 import ElTreeLine from "@/components/ReTreeLine";
-import { onClickOutside } from "@vueuse/core";
+import { onAddPermissionFormClick } from "../form/permission/index";
+import { message } from "@/utils/message";
+import data from "@iconify-icons/ri/fullscreen-fill";
+import { string } from "vue-types";
+
 let dataLoading = ref(true);
 let permission_list = ref([]);
 const getPermissionDatas = async (page: number = 1, limit: number = 20) => {
@@ -11,7 +15,6 @@ const getPermissionDatas = async (page: number = 1, limit: number = 20) => {
     let results = await listPermission();
     permission_list.value = results;
     dataLoading.value = false;
-    console.log(results, "????");
   } catch (e) {
     console.log(e);
   } finally {
@@ -30,7 +33,29 @@ const dataProps = {
 };
 
 const onClickTreeItem = node => {
-  console.log(node.data._id);
+  onAddPermissionFormClick(node.data, function (results) {
+    getPermissionDatas();
+    if (results.success) {
+      message(`您添加了一条权限，名称为： ${results.data.name}`, {
+        customClass: "el"
+      });
+    }
+  });
+};
+
+const onDeletePermissionById = async (id: string, name: string) => {
+  console.log(id, string);
+  let result = await deletePermissionById(id);
+  if (result.success) {
+    message(`您删除了一条权限，名称为： ${name}`, {
+      customClass: "el"
+    });
+  } else {
+    message(`删除错误： ${name}`, {
+      customClass: "el",
+      type: "error"
+    });
+  }
 };
 </script>
 
@@ -42,7 +67,9 @@ const onClickTreeItem = node => {
           <template #header>
             <div class="card-header">
               <span class="font-medium"> 权限树 </span>
-              <el-button class="button">添加主权限</el-button>
+              <el-button class="button" @click="onClickTreeItem({ data: {} })"
+                >添加主权限</el-button
+              >
             </div>
           </template>
           <div class="overflow-y-auto max-h-[710px] min-h-[710px]">
@@ -57,8 +84,19 @@ const onClickTreeItem = node => {
                 <el-tree-line :node="node" :showLabelLine="true">
                   <template v-slot:after-node-label>
                     <span style="padding-right: 10px">
-                      <el-button size="small" @click="onClickTreeItem(node)"
-                        >添加权限</el-button
+                      <el-button
+                        type="primary"
+                        size="small"
+                        @click="onClickTreeItem(node)"
+                        >向下添加权限</el-button
+                      >
+                      <el-button
+                        type="danger"
+                        size="small"
+                        @click="
+                          onDeletePermissionById(node.data._id, node.data.name)
+                        "
+                        >删除</el-button
                       >
                     </span>
                   </template>

@@ -6,7 +6,7 @@ let dataLoading = ref(true);
 let reqlogs = ref([]);
 const getOperatorLogDatas = async (page: number = 1, limit: number = 20) => {
   try {
-    dataLoading.value = false;
+    dataLoading.value = true;
     let results = await listOperatorLog(page, limit);
     pagination = ref({
       current: results.currentPage,
