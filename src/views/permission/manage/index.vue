@@ -83,6 +83,8 @@ const onDeletePermissionById = async (id: string, name: string) => {
               ><template v-slot:default="{ node }">
                 <el-tree-line :node="node" :showLabelLine="true">
                   <template v-slot:after-node-label>
+                    ======
+                    <span>{{ node.data.available }}</span>
                     <span style="padding-right: 10px">
                       <el-button
                         type="primary"

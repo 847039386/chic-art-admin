@@ -25,7 +25,8 @@ export function onAddPermissionFormClick(data: any ,callback) {
   if (data._id) {
     formInline = {
         type: 'API',
-        parent_id :data._id
+        parent_id: data._id,
+        available:data.available
       }
   } else {
     formInline = {
