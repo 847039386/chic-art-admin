@@ -9,6 +9,7 @@ export interface FormProps {
     type: string;
     description: string;
     code: string;
+    parent_path?: string;
     parent_id?: string;
   };
 }
@@ -44,12 +45,18 @@ const is_parent = ref(props.isParent);
         placeholder="请选择权限类型"
       >
         <el-option label="API" value="API" />
-        <el-option label="菜单" value="NUME" />
+        <el-option label="菜单" value="MENU" />
         <el-option label="按钮" value="BTN" />
       </el-select>
     </el-form-item>
     <el-form-item v-show="is_parent" label="父权限">
-      <el-input class="!w-[420px]" v-model="newFormInline.parent_id" />
+      <el-tooltip :content="newFormInline.parent_path" placement="top">
+        <el-input
+          disabled
+          class="!w-[420px]"
+          v-model="newFormInline.parent_path"
+        />
+      </el-tooltip>
     </el-form-item>
     <el-form-item label="权限码">
       <el-input

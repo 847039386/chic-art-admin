@@ -3,7 +3,7 @@ import { baseUrlApi } from "./util"
 
 type Result = {
   success: boolean;
-  data?: [];
+  data?: any;
   message?: string;
   code? :number
 };
@@ -19,3 +19,11 @@ export const httpPermissionAdd = (data?: object) => {
 export const httpPermissionDel = (id: string) => {
   return http.request<Result>("delete", baseUrlApi(`permission/del`),{ data :{ id} });
 };
+
+export const httpPermissionUpdate = (data?: object) => {
+  return http.request<Result>("patch", baseUrlApi(`permission/update`),{data});
+};
+
+export const httpPermissionUpAvailable = (id :string, available:boolean) => {
+  return http.request<Result>("patch", baseUrlApi(`permission/up_available`),{ data :{ id ,available} });
+}

@@ -4,7 +4,7 @@ import { h, createVNode, ref } from "vue";
 import { message } from "@/utils/message";
 import forms from "./index.vue";
 import { addDialog ,closeDialog } from "@/components/ReDialog";
-import { httpPermissionAdd } from "@/api/permission.api";
+import { httpPermissionAdd, httpPermissionUpdate } from "@/api/permission.api";
 
 export interface AddPermissionFormProps {
   formInline: {
@@ -12,30 +12,49 @@ export interface AddPermissionFormProps {
     type: string;
     description: string;
     code: string;
+    parent_path: string;
     parent_id ?:string
   };
 }
 
 let loading = ref(false)
 
-
-export function onAddPermissionFormClick(data: any ,callback) {
+export function onAddPermissionFormClick(action :string ,data: any ,callback :Function) {
 
   let formInline;
-  if (data._id) {
-    formInline = {
-        type: 'API',
-        parent_id: data._id,
-        available:data.available
+  let title;
+  if (action == 'ADD') {
+    if (data._id) {
+      title = '添加权限'
+      formInline = {
+          type: data.type,
+          parent_id: data._id,
+          parent_path:data.parent_path,
+          available:data.available
+        }
+    } else {
+      title = '添加主权限'
+      formInline = {
+          type: 'API',
       }
+    }
   } else {
+    title = '修改权限'
     formInline = {
-        type: 'API',
+      id :data._id,
+      type: data.type,
+      parent_id: data._id,
+      parent_path:data.parent_path,
+      available: data.available,
+      code: data.code,
+      name: data.name,
+      description:data.description
     }
   }
+
   addDialog({
     width: "30%",
-    title: "添加权限",
+    title,
     contentRenderer: () => forms,
     props: {
       // 赋默认值
@@ -44,19 +63,34 @@ export function onAddPermissionFormClick(data: any ,callback) {
     },
     footerRenderer: ({ options, index }) => (
       <div>
-        <el-button onClick={() => closeDialog(options, index)}>取消</el-button>
+        <el-button onClick={() => {
+          closeDialog(options, index)
+          callback(null)
+        }}>取消</el-button>
         <el-button loading={loading.value} onClick={async () => {
           loading.value = true
-          let result = await httpPermissionAdd(formInline);
+          let result;
+          try {
+            if (action == 'ADD') {
+              result = await httpPermissionAdd(formInline);
+            } else {
+              result = await httpPermissionUpdate(formInline);
+            }
+          } catch (error) {
+            callback(error)
+          }
           loading.value = false
           if (!result.success) {
-            message('添加权限错误：'+ result.message ,{ customClass: 'el', type: 'error' })
+            message('添加权限错误：'+ result.message ,{ type: 'error' })
           } else {
-            callback(result)
+            callback(null,result)
             closeDialog(options, index)
           }
         }}>确定</el-button>
       </div>
-    )
+    ),
+    closeCallBack: () => {
+      callback(null)
+    },
   });
 }
