@@ -9,7 +9,7 @@ type Result = {
 };
 
 export const httpPermissionAll = () => {
-  return http.request<Result>("get", baseUrlApi(`permission/tree`));
+  return http.request<Result>("get", baseUrlApi(`permission/list`));
 };
 
 export const httpPermissionAdd = (data?: object) => {
@@ -17,11 +17,11 @@ export const httpPermissionAdd = (data?: object) => {
 };
 
 export const httpPermissionDel = (id: string) => {
-  return http.request<Result>("delete", baseUrlApi(`permission/del`),{ data :{ id} });
+  return http.request<Result>("delete", baseUrlApi(`permission/del/${id}`));
 };
 
 export const httpPermissionUpdate = (data?: object) => {
-  return http.request<Result>("patch", baseUrlApi(`permission/update`),{data});
+  return http.request<Result>("patch", baseUrlApi(`permission/up_info`),{data});
 };
 
 export const httpPermissionUpAvailable = (id :string, available:boolean) => {

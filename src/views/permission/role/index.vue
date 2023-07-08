@@ -2,9 +2,10 @@
 import { ref, onMounted } from "vue";
 import { PureTableBar } from "@/components/RePureTableBar";
 import {
-  permission_list,
+  role_list,
   handleDelete,
-  editPermission,
+  editRole,
+  AddRolePermission,
   onSearch,
   searchForm,
   resetForm,
@@ -34,10 +35,10 @@ const formRef = ref();
       :model="searchForm"
       class="search-form bg-bg_color w-[99/100] pl-8 pt-[12px]"
     >
-      <el-form-item label="权限名称：" prop="name">
+      <el-form-item label="角色名称：" prop="name">
         <el-input
           v-model="searchForm.name"
-          placeholder="请输入权限名称"
+          placeholder="请输入角色名称"
           clearable
           class="!w-[200px]"
         />
@@ -51,18 +52,6 @@ const formRef = ref();
         >
           <el-option label="启用" :value="true" />
           <el-option label="停用" :value="false" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="类型：" prop="type">
-        <el-select
-          v-model="searchForm.type"
-          placeholder="请选择类型"
-          clearable
-          class="!w-[180px]"
-        >
-          <el-option label="API" value="API" />
-          <el-option label="菜单" value="MENU" />
-          <el-option label="按钮" value="BTN" />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -80,24 +69,19 @@ const formRef = ref();
       </el-form-item>
     </el-form>
     <PureTableBar
-      title="权限管理"
+      title="角色管理"
       :columns="columns"
       :tableRef="tableRef?.getTableRef()"
       @refresh="onSearch"
     >
       <template #buttons>
-        <el-tooltip placement="top">
-          <template #content
-            >添加的权限最好是，子级类型与父级类型一致，有利于管理，但并不限制。</template
-          >
-          <el-button
-            type="primary"
-            :icon="useRenderIcon(Plus)"
-            @click="editPermission('ADD')"
-          >
-            添加主权限
-          </el-button>
-        </el-tooltip>
+        <el-button
+          type="primary"
+          :icon="useRenderIcon(Plus)"
+          @click="editRole('ADD')"
+        >
+          添加角色
+        </el-button>
       </template>
       <template v-slot="{ size, dynamicColumns }">
         <pure-table
@@ -113,25 +97,13 @@ const formRef = ref();
           element-loading-text="加载中"
           :loading="loading"
           :size="size"
-          :data="permission_list"
+          :data="role_list"
           :columns="dynamicColumns"
           :header-cell-style="{
             background: 'var(--el-table-row-hover-bg-color)',
             color: 'var(--el-text-color-primary)'
           }"
         >
-          <!-- <template #available="{ row }">
-          <el-switch
-            class="ml-2"
-            inline-prompt
-            style="
-              --el-switch-on-color: #13ce66;
-              --el-switch-off-color: #ff4949;
-            "
-            active-text="完整展示多个内容"
-            inactive-text="多个内容"
-          />
-        </template> -->
           <template #operation="{ row }">
             <el-button
               class="reset-margin"
@@ -139,9 +111,9 @@ const formRef = ref();
               type="primary"
               :size="size"
               :icon="useRenderIcon(Plus)"
-              @click="editPermission('ADD', row)"
+              @click="AddRolePermission(row)"
             >
-              添加
+              添加权限
             </el-button>
             <el-button
               class="reset-margin"
@@ -149,12 +121,12 @@ const formRef = ref();
               type="primary"
               :size="size"
               :icon="useRenderIcon(EditPen)"
-              @click="editPermission('UPDATE', row)"
+              @click="editRole('UPDATE', row)"
             >
               编辑
             </el-button>
             <el-popconfirm
-              :title="`是否确认删除权限名称为${row.name}的这条数据`"
+              :title="`是否确认删除 ${row.name} 这个角色吗？`"
               @confirm="handleDelete(row)"
             >
               <template #reference>

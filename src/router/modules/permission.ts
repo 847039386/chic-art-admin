@@ -13,6 +13,14 @@ export default {
       }
     },
     {
+      path: "/permission/role",
+      name: "PermissionRole",
+      component: () => import("@/views/permission/role/index.vue"),
+      meta: {
+        title: "角色管理"
+      }
+    },
+    {
       path: "/permission/tree",
       name: "PermissionTree",
       component: () => import("@/views/permission/tree/index.vue"),

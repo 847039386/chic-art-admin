@@ -2,15 +2,17 @@ import { reactive, ref ,watch } from "vue";
 import moment from "moment";
 import { ElMessageBox } from "element-plus";
 import { message } from "@/utils/message";
-import { httpPermissionAll, httpPermissionDel, httpPermissionUpAvailable } from "@/api/permission.api";
+import { httpRoleAll, httpRoleDel, httpRoleUpAvailable } from "@/api/role.api";
 import { addTreeAvailableIsDisabled } from "@/utils/tools";
-import { onEditPermissionFormClick } from "../form/permission/index";
+import { onEditRoleFormClick } from "../form/role/index";
+import { onAddRolePermissionFormClick } from "../form/role_permission";
 import { isAllEmpty } from "@pureadmin/utils";
 import { handleTree ,treeToList} from "@/utils/tree";
 // loading
 let dataLoading = ref(false);
 let upAvailableLoading = ref(false)
-let delPermissionLoading = ref(false)
+let delRoleLoading = ref(false)
+let addRoleLoading = ref(false)
 
 export let loading = ref(false)
 // 监听所有loading，当他们都是false的时候主loading才为false
@@ -18,7 +20,7 @@ watch(
   () => [
     dataLoading.value,
     upAvailableLoading.value,
-    delPermissionLoading.value,
+    delRoleLoading.value,
   ],
   (newVal, oldVal) => {
     loading.value =
@@ -26,15 +28,15 @@ watch(
   }
 );
 
+const switchLoadMap = ref({});
 
 // datalist
-export let permission_list = ref([]);
+export let role_list = ref([]);
 
 // 过滤
 export const searchForm = reactive({
     name: "",
     available: null,
-    type:null
 });
 
 const switchStyle = {
@@ -44,18 +46,19 @@ const switchStyle = {
 
 export const columns :TableColumnList = [
     {
-      label: "权限名称",
+      label: "角色名称",
       prop: "name",
       width: 180,
       align: "left"
     },
     {
       label: "状态",
+      width: 100,
       cellRenderer: scope => {
         return <div>
           <el-switch
           size={scope.props.size === "small" ? "small" : "default"}
-          loading={upAvailableLoading.value}
+          loading={switchLoadMap.value[scope.index]?.loading}
           v-model={scope.row.available}
           disabled={scope.row.disabled}
           active-value={true}
@@ -70,34 +73,9 @@ export const columns :TableColumnList = [
       }
     },
     {
-      label: "类型",
-      width: 100,
-      cellRenderer: ({ row }) => {
-        let type_str;
-        switch (row.type) {
-          case 'API':
-            type_str = 'API'
-            break;
-          case 'MENU':
-            type_str = '菜单'
-            break;
-          case 'BTN':
-            type_str = '按钮'
-            break;
-          default:
-            type_str = '其他'
-            break;
-        }
-        return type_str
-    }
-    },
-    {
-      label: "权限码",
-      prop: "code",
-    },
-    {
       label: "描述",
       prop: "description",
+      align: "left"
     },
     {
       label: "创建时间",
@@ -130,54 +108,67 @@ function onChange({ row, index }) {
       }
     )
       .then(async () => {
-        upAvailableLoading.value = true
-        let result = await httpPermissionUpAvailable(row._id, row.available)
+        // 这里因为没有子集所以不需要像权限关闭一样，需要重新洗牌数据
+        switchLoadMap.value[index] = Object.assign({},switchLoadMap.value[index],{loading: true});
+        let result = await httpRoleUpAvailable(row._id, row.available)
         let mst = row.available ? '启动' : '停用'
         if (result.success) {
-          onSearch()
-          message(`${row.name} ${mst}成功，包括他的子集生效 ${result.data.matchedCount} 条`,{type:'success'})
+          message(`${row.name} ${mst}成功`,{type:'success'})
         } else {
           message(`${row.name} ${mst}失败：${result.message}`,{type:'error'})
           row.available = !row.available
         }
-        upAvailableLoading.value = false
+        switchLoadMap.value[index] = Object.assign({},switchLoadMap.value[index],{loading: false});
       })
       .catch(() => {
-        upAvailableLoading.value = false
         row.available === false ? (row.available = true) : (row.available = false);
       });
 }
 
 export const handleDelete = async (row) => {
   let id = row._id
-  delPermissionLoading.value = true
+  delRoleLoading.value = true
   try {
-    const result = await httpPermissionDel(id) 
-    delPermissionLoading.value = false
+    const result = await httpRoleDel(id) 
+    delRoleLoading.value = false
     if (result.success) {
       onSearch()
-      message(`${row.name} 删除成功，包括他的子集生效 ${result.data.deletedCount} 条`,{type:'success'})
+      message(`${row.name} 角色删除成功`,{type:'success'})
     } else {
       message(`${row.name} 删除失败：${result.message}`,{type:'error'})
     }
   } catch (error) {
-    delPermissionLoading.value = false
+    delRoleLoading.value = false
     message(`${row.name} 删除失败：${error.message}`,{type:'error'})
   }
 }
 
-export const editPermission = async (action :string ,row?: any) => {
+export const editRole = async (action :string ,row?: any) => {
   row = row || {}
-  onEditPermissionFormClick(action,row, function ( err ,results) {
+  onEditRoleFormClick(action,row, function ( err ,results) {
       if (!err && results) {
         onSearch();
         if (results.success) {
           if (action == 'ADD') {
-            message(`您添加了一条权限，名称为： ${results.data.name}`,{type:'success'});
+            message(`您添加了一个角色，名称为： ${results.data.name}`,{type:'success'});
           } else {
-            message(`您修改了一条权限，ID为： ${results.data._id}`,{type:'success'});
+            message(`您修改了一个角色，ID为： ${results.data._id}`,{type:'success'});
           }
           
+        }
+      } else if(err){
+        message(`错误： ${err.message}`,{type:'error'});
+      }
+  });
+}
+
+export const AddRolePermission = async (row: any) => {
+  row = row || {}
+  onAddRolePermissionFormClick(row, function ( err ,results) {
+      if (!err && results) {
+        onSearch();
+        if (results.success) {
+          message(`您添加了一个角色，名称为： ${results.data.name}`,{type:'success'});
         }
       } else if(err){
         message(`错误： ${err.message}`,{type:'error'});
@@ -189,7 +180,7 @@ export const editPermission = async (action :string ,row?: any) => {
 
 export const onSearch = async () => {
   dataLoading.value = true
-  const request = await httpPermissionAll() 
+  const request = await httpRoleAll() 
   let newData = treeToList(addTreeAvailableIsDisabled(handleTree(request.data, '_id', 'parent_id')));
   
   if (!isAllEmpty(searchForm.name)) {
@@ -200,12 +191,8 @@ export const onSearch = async () => {
     // 前端搜索权限状态
     newData = newData.filter(item => item.available === searchForm.available);
   }
-  if (!isAllEmpty(searchForm.type)) {
-    // 前端搜索权限类型
-    newData = newData.filter(item => item.type === searchForm.type);
-  }
 
-  permission_list.value = handleTree(newData, '_id', 'parent_id'); // 处理成树结构
+  role_list.value = handleTree(newData, '_id', 'parent_id'); // 处理成树结构
   dataLoading.value = false
 };
 
