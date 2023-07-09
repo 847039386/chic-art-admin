@@ -4,12 +4,14 @@ import { PureTableBar } from "@/components/RePureTableBar";
 import {
   role_list,
   handleDelete,
+  handleRolePermissionDelete,
   editRole,
   AddRolePermission,
   onSearch,
   searchForm,
   resetForm,
   columns,
+  permissionColumns,
   loading
 } from "./index";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
@@ -93,7 +95,6 @@ const formRef = ref();
           row-key="_id"
           showOverflowTooltip
           table-layout="auto"
-          default-expand-all
           element-loading-text="加载中"
           :loading="loading"
           :size="size"
@@ -104,6 +105,34 @@ const formRef = ref();
             color: 'var(--el-text-color-primary)'
           }"
         >
+          <template #expand="{ row }">
+            <div>
+              <pure-table
+                :data="row.permissions"
+                :columns="permissionColumns"
+                :border="true"
+              >
+                <template #rp_operation="{ row }">
+                  <el-popconfirm
+                    :title="`是否确认删除 ${row.permission.name} 这条权限吗？`"
+                    @confirm="handleRolePermissionDelete(row)"
+                  >
+                    <template #reference>
+                      <el-button
+                        class="reset-margin"
+                        link
+                        type="primary"
+                        :size="size"
+                        :icon="useRenderIcon(Delete)"
+                      >
+                        删除
+                      </el-button>
+                    </template>
+                  </el-popconfirm>
+                </template>
+              </pure-table>
+            </div>
+          </template>
           <template #operation="{ row }">
             <el-button
               class="reset-margin"

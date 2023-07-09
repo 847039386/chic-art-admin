@@ -5,6 +5,8 @@ import { addDialog, closeDialog } from "@/components/ReDialog";
 import { handleTree } from "@/utils/tree";
 import { httpPermissionAll } from "@/api/permission.api";
 import { ElLoading } from 'element-plus'
+import { httpRolePermissionAdd, httpRolePermissionByRoleId } from "@/api/role_permission.api";
+import { addTreeRolePermissionDisabled } from "@/utils/tools";
 
 let loading = ref(false)
 
@@ -12,14 +14,6 @@ let permissionTreeOptions = ref([]);
 
 
 
-const getPermissionAll = async () => {
-  // loading.value = true;
-  const loadingInstance = ElLoading.service({ text:'权限树加载中'  })
-  const results = await httpPermissionAll();
-  permissionTreeOptions.value = handleTree(results.data, "_id", "parent_id");
-  loadingInstance.close()
-  // loading.value = false;
-};
 
 
 export const onAddRolePermissionFormClick = async (data: any ,callback :Function) => {
@@ -27,9 +21,16 @@ export const onAddRolePermissionFormClick = async (data: any ,callback :Function
 
   const loadingInstance = ElLoading.service({ text:'权限树加载中'  })
   const results = await httpPermissionAll();
+  const resultsRP = await httpRolePermissionByRoleId(data._id)
   loadingInstance.close()
-  if (results.success) {
-    permissionTreeOptions.value = handleTree(results.data, "_id", "parent_id");
+  if (results.success, resultsRP.success) {
+    let ids = []
+    resultsRP.data.forEach(element => {
+      ids.push(element.permission_id)
+    });
+    let tree = handleTree(results.data, "_id", "parent_id")
+    let newTree = addTreeRolePermissionDisabled(ids,tree)
+    permissionTreeOptions.value = newTree;
   } else {
     callback({ message: results.message })
     return 
@@ -56,20 +57,18 @@ export const onAddRolePermissionFormClick = async (data: any ,callback :Function
         }}>取消</el-button>
         <el-button type="primary" loading={loading.value} onClick={async () => {
           try {
-            console.log(formInline)
-            // loading.value = true
-            // let result = await httpRoleAdd(formInline);
-            // loading.value = false
-            // if (!result.success) {
-            //   message('添加角色错误：'+ result.message ,{ type: 'error' })
-            // } else {
-            //   callback(null,result)
-            //   closeDialog(options, index)
-            // }
             if (!formInline.permission_id) {
               message('权限ID不能为空' ,{ type: 'error' })
             } else {
-              
+              loading.value = true;
+              let result = await httpRolePermissionAdd(formInline.role_id, formInline.permission_id)
+              loading.value = false;
+              if (!result.success) {
+                message('添加权限错误：'+ result.message ,{ type: 'error' })
+              } else {
+                callback(null, result)
+                closeDialog(options, index)
+              }
             }
           } catch (error) {
             callback(error)
