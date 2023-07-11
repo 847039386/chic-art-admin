@@ -7,9 +7,8 @@ export interface FormProps {
   isParent: boolean;
   formInline: {
     name: string;
-    type: string;
+    type: number;
     description: string;
-    code: string;
     parent_path?: string;
     parent_id?: string;
   };
@@ -18,7 +17,7 @@ export interface FormProps {
 // 声明 props 默认值
 // 推荐阅读：https://cn.vuejs.org/guide/typescript/composition-api.html#typing-component-props
 const props = withDefaults(defineProps<FormProps>(), {
-  formInline: () => ({ name: "", type: "API", description: "", code: "" })
+  formInline: () => ({ name: "", type: 0, description: "" })
 });
 
 // vue 规定所有的 prop 都遵循着单向绑定原则，直接修改 prop 时，Vue 会抛出警告。此处的写法仅仅是为了消除警告。
@@ -39,16 +38,11 @@ const is_parent = ref(props.isParent);
         placeholder="名称"
       />
     </el-form-item>
-    <el-form-item label="类型" prop="type">
-      <el-select
-        class="!w-[420px]"
-        v-model="newFormInline.type"
-        placeholder="请选择权限类型"
-      >
-        <el-option label="API" value="API" />
-        <el-option label="菜单" value="MENU" />
-        <el-option label="按钮" value="BTN" />
-      </el-select>
+    <el-form-item label="名称" prop="type">
+      <el-radio-group v-model="newFormInline.type">
+        <el-radio :label="0" size="large">可访问</el-radio>
+        <el-radio :label="1" size="large">可授权</el-radio>
+      </el-radio-group>
     </el-form-item>
     <el-form-item v-show="is_parent" label="父权限" prop="parent_path">
       <el-tooltip :content="newFormInline.parent_path" placement="top">
@@ -58,13 +52,6 @@ const is_parent = ref(props.isParent);
           v-model="newFormInline.parent_path"
         />
       </el-tooltip>
-    </el-form-item>
-    <el-form-item label="权限码" prop="code">
-      <el-input
-        class="!w-[420px]"
-        v-model="newFormInline.code"
-        placeholder="请输入权限码，路由用api代替"
-      />
     </el-form-item>
     <el-form-item label="描述" prop="description">
       <el-input

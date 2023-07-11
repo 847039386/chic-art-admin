@@ -65,32 +65,33 @@ export function onEditPermissionFormClick(action :string ,data: any ,callback :F
       <div>
         <el-button onClick={() => {
           closeDialog(options, index)
-          callback(null)
         }}>取消</el-button>
         <el-button loading={loading.value} type="primary" onClick={async () => {
+          console.log(loading.value)
           loading.value = true
           let result;
           try {
+            if (!formInline.name || !formInline.description || !formInline.code) {
+              throw new Error('请正规的填写信息')
+            }
             if (action == 'ADD') {
               result = await httpPermissionAdd(formInline);
             } else {
               result = await httpPermissionUpdate(formInline);
             }
+            loading.value = false
+            if (!result.success) {
+              throw new Error(result.message)
+            } else {
+              callback(null,result)
+              closeDialog(options, index)
+            }
           } catch (error) {
             callback(error)
           }
-          loading.value = false
-          if (!result.success) {
-            message('添加权限错误：'+ result.message ,{ type: 'error' })
-          } else {
-            callback(null,result)
-            closeDialog(options, index)
-          }
+          
         }}>确定</el-button>
       </div>
-    ),
-    closeCallBack: () => {
-      callback(null)
-    },
+    )
   });
 }

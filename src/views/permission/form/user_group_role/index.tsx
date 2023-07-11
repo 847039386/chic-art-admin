@@ -6,38 +6,45 @@ import { httpPermissionAll } from "@/api/permission.api";
 import { ElLoading } from 'element-plus'
 import { httpRolePermissionAdd, httpRolePermissionByRoleId } from "@/api/role_permission.api";
 import { addTreeRolePermissionDisabled } from "@/utils/tools";
+import { httpRoleAll } from "@/api/role.api";
+import { httpUserGroupRoleAdd, httpUserGroupRoleByUserGroupId } from "@/api/user_group_role.api";
 
 let loading = ref(false)
 
-let permissionTreeOptions = ref([]);
+let roles = ref([]);
 
-export const onAddRolePermissionFormClick = async (data: any ,callback :Function) => {
-
-  const loadingInstance = ElLoading.service({ text:'权限树加载中'  })
-  const results = await httpPermissionAll();
-  const resultsRP = await httpRolePermissionByRoleId(data._id)
+export const onAddUserGroupRoleFormClick = async (data: any, callback: Function) => {
+  const loadingInstance = ElLoading.service({ text:'角色加载中'  })
+  const results = await httpRoleAll()
   loadingInstance.close()
-  if (results.success && resultsRP.success) {
-    let ids = []
-    resultsRP.data.forEach(element => {
-      ids.push(element.permission_id)
+  if (results.success) {
+    if (data.roles.length > 0) {
+      results.data.map(item => {
+      item.disabled = false;
+      for (let index = 0; index < data.roles.length; index++) {
+        const element = data.roles[index];
+        if (element.role_id == item._id) {
+          item.disabled = true;
+          break;
+        }
+      }
+      return item
     });
-    let tree = handleTree(results.data, "_id", "parent_id")
-    let newTree = addTreeRolePermissionDisabled(ids,tree)
-    permissionTreeOptions.value = newTree;
+    }
+    roles.value = results.data;
   } else {
     callback({ message: results.message })
     return 
   }
   let formInline :any = {
-    role_name:data.name,
-    role_id: data._id,
-    permission_tree_options:permissionTreeOptions
+    user_group_name: data.name,
+    user_group_id: data._id,
+    role_options: roles.value
   };
 
   addDialog({
     width: "30%",
-    title: '添加权限',
+    title: '为用户组添加角色',
     closeOnClickModal: false,
     contentRenderer: () => forms,
     props: {
@@ -50,11 +57,12 @@ export const onAddRolePermissionFormClick = async (data: any ,callback :Function
         }}>取消</el-button>
         <el-button type="primary" loading={loading.value} onClick={async () => {
           try {
-            if (!formInline.permission_id) {
-              throw new Error('权限ID不能为空')
+            console.log(data)
+            if (!formInline.user_group_name || !formInline.user_group_id || !formInline.role_id) {
+              throw new Error('请正规的填写信息')
             }
             loading.value = true;
-            let result = await httpRolePermissionAdd(formInline.role_id, formInline.permission_id)
+            let result = await httpUserGroupRoleAdd(data._id,formInline.role_id)
             loading.value = false;
             if (!result.success) {
               throw new Error(result.message)

@@ -21,6 +21,14 @@ export default {
       }
     },
     {
+      path: "/permission/user_group",
+      name: "PermissionUserGroup",
+      component: () => import("@/views/permission/user_group/index.vue"),
+      meta: {
+        title: "用户组管理"
+      }
+    },
+    {
       path: "/permission/tree",
       name: "PermissionTree",
       component: () => import("@/views/permission/tree/index.vue"),

@@ -48,16 +48,14 @@ const onLogin = async (formEl: FormInstance | undefined) => {
           password: ruleForm.password
         })
         .then(res => {
-          if (res.success) {
-            // 获取后端路由
-            initRouter().then(() => {
-              router.push(getTopMenu(true).path);
-              message("登录成功", { type: "success" });
-            });
-          } else {
-            loading.value = false;
-            message(`登录失败: ${res.message}`, { type: "error" });
-          }
+          initRouter().then(() => {
+            router.push(getTopMenu(true).path);
+            message("登录成功", { type: "success" });
+          });
+        })
+        .catch(error => {
+          loading.value = false;
+          message(`登录失败：${error.message}`, { type: "error" });
         });
     } else {
       loading.value = false;

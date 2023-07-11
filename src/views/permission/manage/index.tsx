@@ -168,18 +168,15 @@ export const handleDelete = async (row) => {
 
 export const editPermission = async (action :string ,row?: any) => {
   row = row || {}
-  onEditPermissionFormClick(action,row, function ( err ,results) {
-      if (!err && results) {
+  onEditPermissionFormClick(action, row, function (err, results) {
+    if (!err) {
         onSearch();
-        if (results.success) {
-          if (action == 'ADD') {
-            message(`您添加了一条权限，名称为： ${results.data.name}`,{type:'success'});
-          } else {
-            message(`您修改了一条权限，ID为： ${results.data._id}`,{type:'success'});
-          }
-          
+        if (action == 'ADD') {
+          message(`您添加了一条权限，名称为： ${results.data.name}`,{type:'success'});
+        } else {
+          message(`您修改了一条权限，ID为： ${results.data._id}`,{type:'success'});
         }
-      } else if(err){
+      } else {
         message(`错误： ${err.message}`,{type:'error'});
       }
   });

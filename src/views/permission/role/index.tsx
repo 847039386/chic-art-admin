@@ -223,12 +223,10 @@ export const editRole = async (action :string ,row?: any) => {
 export const AddRolePermission = async (row: any) => {
   row = row || {}
   onAddRolePermissionFormClick(row, function ( err ,results) {
-      if (!err && results) {
+      if (!err) {
         onSearch();
-        if (results.success) {
-          message(`您添加了一条权限`,{type:'success'});
-        }
-      } else if(err){
+        message(`您添加了一条权限`,{type:'success'});
+      } else {
         message(`错误： ${err.message}`,{type:'error'});
       }
   });
@@ -251,7 +249,6 @@ export const onSearch = async () => {
     }
     return item
   })
-  console.log(newData)
   if (!isAllEmpty(searchForm.name)) {
     // 前端搜索权限名称
     newData = newData.filter(item => item.name.includes(searchForm.name));

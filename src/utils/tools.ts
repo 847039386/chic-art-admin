@@ -35,12 +35,10 @@ export const addTreeAvailableIsDisabled = (tree: any[] ,parent_available ?:boole
  * @returns 
  */
 export const addTreeRolePermissionDisabled = (ids: any[], tree: any[], parent_disabled?: boolean) => {
-  console.log(ids)
   tree.map((item) => {
     for (let index = 0; index < ids.length; index++) {
       const element = ids[index];
       if (element == item._id) {
-        console.log(element,parent_disabled)
         item.disabled = true
       }
     }
@@ -51,7 +49,6 @@ export const addTreeRolePermissionDisabled = (ids: any[], tree: any[], parent_di
       }
     }
 
-    console.log(item)
     if (item.children && item.children.length) {
       if (typeof item.disabled == 'undefined') {
         item.disabled = false

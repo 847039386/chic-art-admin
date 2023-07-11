@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { formRules } from "./rule";
 
 // 声明 props 类型
 export interface FormProps {
@@ -24,15 +25,15 @@ const newFormInline = ref(props.formInline);
 </script>
 
 <template>
-  <el-form :model="newFormInline" label-width="80px">
-    <el-form-item label="名称">
+  <el-form :model="newFormInline" label-width="80px" :rules="formRules">
+    <el-form-item label="名称" prop="name">
       <el-input
         class="!w-[420px]"
         v-model="newFormInline.name"
         placeholder="名称"
       />
     </el-form-item>
-    <el-form-item label="描述">
+    <el-form-item label="描述" prop="description">
       <el-input
         class="!w-[420px]"
         v-model="newFormInline.description"

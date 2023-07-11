@@ -4,28 +4,48 @@ import { h, createVNode, ref } from "vue";
 import { message } from "@/utils/message";
 import forms from "./index.vue";
 import { addDialog ,closeDialog } from "@/components/ReDialog";
-import { httpRoleAdd, httpRoleUpdate } from "@/api/role.api";
+import { httpUserGroupAdd, httpUserGroupUpdate } from "@/api/user_group.api";
 
-export interface AddRoleFormProps {
+export interface AddUserGroupFormProps {
   formInline: {
     name: string;
+    type: string;
     description: string;
+    code: string;
+    parent_path: string;
+    parent_id ?:string
   };
 }
 
 let loading = ref(false)
 
-export function onEditRoleFormClick(action :string ,data: any ,callback :Function) {
+export function onEditUserGroupFormClick(action :string ,data: any ,callback :Function) {
 
   let formInline;
   let title;
   if (action == 'ADD') {
-    title = '添加角色'
-    formInline = { }
+    if (data._id) {
+      title = '添加用户组'
+      formInline = {
+          type: data.type,
+          parent_id: data._id,
+          parent_path:data.parent_path,
+          available:data.available
+        }
+    } else {
+      title = '添加用户组'
+      formInline = {
+          type: 0,
+      }
+    }
   } else {
-    title = '修改角色'
+    title = '修改组'
     formInline = {
       id :data._id,
+      type: data.type,
+      parent_id: data._id,
+      parent_path:data.parent_path,
+      available: data.available,
       name: data.name,
       description:data.description
     }
@@ -36,6 +56,8 @@ export function onEditRoleFormClick(action :string ,data: any ,callback :Functio
     title,
     contentRenderer: () => forms,
     props: {
+      // 赋默认值
+      isParent: data._id ? true : false,
       formInline
     },
     footerRenderer: ({ options, index }) => (
@@ -43,18 +65,17 @@ export function onEditRoleFormClick(action :string ,data: any ,callback :Functio
         <el-button onClick={() => {
           closeDialog(options, index)
         }}>取消</el-button>
-        <el-button loading={loading.value} onClick={async () => {
-          
-          let result;
+        <el-button loading={loading.value} type="primary" onClick={async () => {
           try {
             if (!formInline.name || !formInline.description) {
               throw new Error('请正规的填写信息')
             }
+            let result;
             loading.value = true
             if (action == 'ADD') {
-              result = await httpRoleAdd(formInline);
+              result = await httpUserGroupAdd(formInline);
             } else {
-              result = await httpRoleUpdate(formInline);
+              result = await httpUserGroupUpdate(formInline);
             }
             loading.value = false
             if (!result.success) {

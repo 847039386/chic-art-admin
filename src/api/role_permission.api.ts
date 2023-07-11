@@ -9,7 +9,8 @@ type Result = {
 };
 
 
-export const httpRolePermissionAdd = (role_id: string ,permission_id :string) => {
+export const httpRolePermissionAdd = (role_id: string, permission_id: string) => {
+  console.log(role_id, permission_id)
   return http.request<Result>("post", baseUrlApi(`role-permission/add`),{data :{ role_id, permission_id}});
 };
 

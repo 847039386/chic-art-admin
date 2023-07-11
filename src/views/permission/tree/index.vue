@@ -1,10 +1,20 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
-import { getPermissionDatas, loading, permission_list } from "./index";
+import {
+  loading,
+  permission_list,
+  role_list,
+  user_group_list,
+  getRoleDatas,
+  getUserGroupDatas,
+  getPermissionDatas
+} from "./index";
 import ElTreeLine from "@/components/ReTreeLine";
 
 onMounted(() => {
   getPermissionDatas();
+  getRoleDatas();
+  getUserGroupDatas();
 });
 
 const dataProps = {
@@ -46,7 +56,19 @@ const dataProps = {
               <span class="font-medium"> 角色树 </span>
             </div>
           </template>
-          <div class="overflow-y-auto max-h-[710px] min-h-[710px]"></div>
+          <div class="overflow-y-auto max-h-[710px] min-h-[710px]">
+            <el-tree
+              :indent="30"
+              :data="role_list"
+              :props="dataProps"
+              :expand-on-click-node="false"
+              default-expand-all
+              node-key="_id"
+              ><template v-slot:default="{ node }">
+                <el-tree-line :node="node" :showLabelLine="true"></el-tree-line>
+              </template>
+            </el-tree>
+          </div>
         </el-card>
       </el-col>
 
@@ -57,7 +79,19 @@ const dataProps = {
               <span class="font-medium"> 用户组 </span>
             </div>
           </template>
-          <div class="overflow-y-auto max-h-[710px] min-h-[710px]"></div>
+          <div class="overflow-y-auto max-h-[710px] min-h-[710px]">
+            <el-tree
+              :indent="30"
+              :data="user_group_list"
+              :props="dataProps"
+              :expand-on-click-node="false"
+              default-expand-all
+              node-key="_id"
+              ><template v-slot:default="{ node }">
+                <el-tree-line :node="node" :showLabelLine="true"></el-tree-line>
+              </template>
+            </el-tree>
+          </div>
         </el-card>
       </el-col>
     </el-row>
