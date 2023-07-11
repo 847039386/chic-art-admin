@@ -17,7 +17,7 @@ export const httpRoleAdd = (data?: object) => {
 };
 
 export const httpRoleDel = (id: string) => {
-  return http.request<Result>("delete", baseUrlApi(`role/del/${id}`));
+  return http.request<Result>("delete", baseUrlApi(`role/del`), { params: { id } });
 };
 
 export const httpRoleUpdate = (data?: object) => {

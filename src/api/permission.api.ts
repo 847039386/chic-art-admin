@@ -17,7 +17,7 @@ export const httpPermissionAdd = (data?: object) => {
 };
 
 export const httpPermissionDel = (id: string) => {
-  return http.request<Result>("delete", baseUrlApi(`permission/del/${id}`));
+  return http.request<Result>("delete", baseUrlApi('permission/del'), { params: { id } });
 };
 
 export const httpPermissionUpdate = (data?: object) => {

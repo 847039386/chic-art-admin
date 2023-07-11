@@ -14,9 +14,9 @@ export const httpUserGroupRoleAdd = (user_group_id: string ,role_id :string) => 
 };
 
 export const httpUserGroupRoleDel = (id: string) => {
-  return http.request<Result>("delete", baseUrlApi(`user-group-role/del/${id}`));
+  return http.request<Result>("delete", baseUrlApi('user-group-role/del'), { params: { id } });
 };
 
 export const httpUserGroupRoleByUserGroupId = (user_group_id: string) => {
-  return http.request<Result>("get", baseUrlApi(`user-group-role/role/${user_group_id}`));
+  return http.request<Result>("get", baseUrlApi('user-group-role/roles'), { params: { user_group_id } });
 };

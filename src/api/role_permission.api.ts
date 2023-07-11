@@ -15,9 +15,9 @@ export const httpRolePermissionAdd = (role_id: string, permission_id: string) =>
 };
 
 export const httpRolePermissionDel = (id: string) => {
-  return http.request<Result>("delete", baseUrlApi(`role-permission/del/${id}`));
+  return http.request<Result>("delete", baseUrlApi('role-permission/del'), { params: { id } });
 };
 
 export const httpRolePermissionByRoleId = (role_id: string) => {
-  return http.request<Result>("get", baseUrlApi(`role-permission/permissions/${role_id}`));
+  return http.request<Result>("get", baseUrlApi('role-permission/permissions'), { params: { role_id } });
 };

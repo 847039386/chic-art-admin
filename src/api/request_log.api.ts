@@ -13,6 +13,6 @@ type Result = {
 };
 
 export const httpRequestLogAll = (page: number, limit: number) => {
-  return http.request<Result>("get", baseUrlApi(`request-log/list?page=${page}&limit=${limit}`));
+  return http.request<Result>("get", baseUrlApi(`request-log/list`),{ params :{ page,limit } });
 };
 

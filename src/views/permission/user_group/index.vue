@@ -148,16 +148,23 @@ const formRef = ref();
             >
               添加
             </el-button>
-            <el-button
-              class="reset-margin"
-              link
-              type="primary"
-              :size="size"
-              :icon="useRenderIcon(EditPen)"
-              @click="editUserGroup('UPDATE', row)"
+
+            <el-popconfirm
+              :title="`是否确认删除用户组名称为${row.name}的这条数据`"
+              @confirm="handleDelete(row)"
             >
-              编辑
-            </el-button>
+              <template #reference>
+                <el-button
+                  class="reset-margin"
+                  link
+                  type="primary"
+                  :size="size"
+                  :icon="useRenderIcon(Delete)"
+                >
+                  删除
+                </el-button>
+              </template>
+            </el-popconfirm>
             <el-dropdown trigger="click">
               <el-button
                 class="ml-3 mt-[2px]"
@@ -183,22 +190,16 @@ const formRef = ref();
                     </el-dropdown-item>
                   </div>
                   <el-dropdown-item>
-                    <el-popconfirm
-                      :title="`是否确认删除用户组名称为${row.name}的这条数据`"
-                      @confirm="handleDelete(row)"
+                    <el-button
+                      :class="buttonClass"
+                      link
+                      type="primary"
+                      :size="size"
+                      :icon="useRenderIcon(EditPen)"
+                      @click="editUserGroup('UPDATE', row)"
                     >
-                      <template #reference>
-                        <el-button
-                          :class="buttonClass"
-                          link
-                          type="primary"
-                          :size="size"
-                          :icon="useRenderIcon(Delete)"
-                        >
-                          删除
-                        </el-button>
-                      </template>
-                    </el-popconfirm>
+                      编辑
+                    </el-button>
                   </el-dropdown-item>
                 </el-dropdown-menu>
               </template>

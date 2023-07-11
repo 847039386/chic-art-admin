@@ -17,7 +17,7 @@ export const httpUserGroupAdd = (data?: object) => {
 };
 
 export const httpUserGroupDel = (id: string) => {
-  return http.request<Result>("delete", baseUrlApi(`user-group/del/${id}`));
+  return http.request<Result>("delete", baseUrlApi('user-group/del'), { params: { id } });
 };
 
 export const httpUserGroupUpdate = (data?: object) => {
