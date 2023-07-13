@@ -292,7 +292,7 @@ export const openDrawerSeleteRole = async (row) => {
 
 export const closeDrawerSeleteRole = () => {
   user_group_roles.value = []
-  // ing_selected_user_group.value = {}
+  ing_selected_user_group.value = {}
   drawerRoles.value = false
 }
 
