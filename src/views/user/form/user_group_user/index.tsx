@@ -2,37 +2,38 @@ import { ref } from "vue";
 import forms from "./index.vue";
 import { addDialog, closeDialog } from "@/components/ReDialog";
 import { handleTree } from "@/utils/tree";
-import { httpPermissionAll } from "@/api/permission.api";
 import { ElLoading } from 'element-plus'
 import { httpRolePermissionAdd, httpRolePermissionByRoleId } from "@/api/role_permission.api";
 import { addTreeRolePermissionDisabled } from "@/utils/tools";
+import { httpUserGroupAll } from "@/api/user_group.api";
+import { httpUserGroupByUserId, httpUserGroupUserAdd } from "@/api/user_group_user.api";
 
 let loading = ref(false)
 
-let permissionTreeOptions = ref([]);
+let userGroupTreeOptions = ref([]);
 
-export const onAddRolePermissionFormClick = async (data: any, callback: Function) => {
+export const onAddToUserGroupFormClick = async (data: any, callback: Function) => {
 
-  const loadingInstance = ElLoading.service({ text: '权限树加载中' })
-  const results = await httpPermissionAll();
-  const resultsRP = await httpRolePermissionByRoleId(data._id)
+  const loadingInstance = ElLoading.service({ text: '用户组加载中' })
+  const results = await httpUserGroupAll();
+  const resultsUG = await httpUserGroupByUserId(data._id)
   loadingInstance.close()
-  if (results.success && resultsRP.success) {
+  if (results.success && resultsUG.success) {
     let ids = []
-    resultsRP.data.forEach(element => {
-      ids.push(element.permission_id)
+    resultsUG.data.forEach(element => {
+      ids.push(element.user_group_id)
     });
     let tree = handleTree(results.data, "_id", "parent_id")
     let newTree = addTreeRolePermissionDisabled(ids, tree)
-    permissionTreeOptions.value = newTree;
+    userGroupTreeOptions.value = newTree;
   } else {
     callback({ message: results.message })
     return
   }
   let formInline: any = {
-    role_name: data.name,
-    role_id: data._id,
-    permission_tree_options: permissionTreeOptions
+    name: data.name,
+    user_id: data._id,
+    user_group_tree_options: userGroupTreeOptions
   };
 
   addDialog({
@@ -50,11 +51,11 @@ export const onAddRolePermissionFormClick = async (data: any, callback: Function
         }}>取消</el-button>
         <el-button type="primary" loading={loading.value} onClick={async () => {
           try {
-            if (!formInline.permission_id) {
-              throw new Error('权限ID不能为空')
+            if (!formInline.user_group_id) {
+              throw new Error('用户组ID不能为空')
             }
             loading.value = true;
-            let result = await httpRolePermissionAdd(formInline.role_id, formInline.permission_id)
+            let result = await httpUserGroupUserAdd(formInline.user_id, formInline.user_group_id)
             loading.value = false;
             if (!result.success) {
               throw new Error(result.message)
@@ -62,6 +63,7 @@ export const onAddRolePermissionFormClick = async (data: any, callback: Function
               callback(null, result)
               closeDialog(options, index)
             }
+            console.log(formInline, 'aaaa???')
           } catch (error) {
             callback(error)
           }
