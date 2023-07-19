@@ -1,22 +1,52 @@
 import Bowser from "bowser";
 import moment from "moment";
-import { reactive } from "vue";
+import { reactive ,ref } from "vue";
 import { addDialog } from "@/components/ReDialog";
 import { httpOperatorLogAll } from "@/api/operator_log.api";
+import { message } from "@/utils/message";
 
-export const listOperatorLog = async (page: number, limit: number) => {
-  const request = await httpOperatorLogAll(page, limit) 
-  if (request.data.rows.length > 0) {
-    request.data.rows.map((item: any) => {
-      let bowser = Bowser.parse(item.platform)
-      item.device = bowser.platform.type
-      item.system = bowser.os.name
-      item.c_time = moment(item.create_time).format('YYYY-MM-DD/HH:mm')
-      return item;
-    })
+
+export let dataLoading = ref(false);
+export let reqlogs = ref([]);
+export let pagination = ref({ current: 1, pageSize: 20, total: 0 });
+
+export const onSearch = async (page: number, limit: number) => {
+  try {
+    dataLoading.value = true
+    const request = await httpOperatorLogAll(page, limit)
+    if (request.success) {
+      if (request.data.rows.length > 0) {
+        request.data.rows.map((item: any) => {
+          let bowser = Bowser.parse(item.platform)
+          item.device = bowser.platform.type
+          item.system = bowser.os.name
+          item.c_time = moment(item.create_time).format('YYYY-MM-DD/HH:mm')
+          return item;
+        })
+        reqlogs.value = request.data.rows
+        pagination = ref({
+          current: request.data.currentPage,
+          pageSize: request.data.pageSize,
+          total: request.data.total
+        });
+      }
+    } else {
+      message(`错误：${request.message}`,{type:'error'});
+    }
+  } catch (error) {
+    message(`错误：${error.message}`, { type: 'error' });
+  } finally {
+    dataLoading.value = false
   }
-  
-  return request.data
+
+}
+
+export function onPageSizeChange(value: number) {
+  onSearch(pagination.value.current, value);
+}
+
+export function onCurrentChange(value: number) {
+  onSearch(value, pagination.value.pageSize);
 }
 
 export const columns: TableColumnList = [

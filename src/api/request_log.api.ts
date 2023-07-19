@@ -3,6 +3,8 @@ import { baseUrlApi } from "./util"
 
 type Result = {
   success: boolean;
+  message: string;
+  code: number;
   data?: {
     /** 列表数据 */
     currentPage?: number

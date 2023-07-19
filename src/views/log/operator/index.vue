@@ -1,39 +1,19 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { columns, listOperatorLog, openJSONDialog } from "./index";
-let pagination = ref({ current: 1, pageSize: 20, total: 0 });
-let dataLoading = ref(true);
-let reqlogs = ref([]);
-const getOperatorLogDatas = async (page: number = 1, limit: number = 20) => {
-  try {
-    dataLoading.value = true;
-    let results = await listOperatorLog(page, limit);
-    pagination = ref({
-      current: results.currentPage,
-      pageSize: results.pageSize,
-      total: results.total
-    });
-    reqlogs.value = results.rows;
-    dataLoading.value = false;
-  } catch (e) {
-    console.log(e);
-  } finally {
-    setTimeout(() => {
-      dataLoading.value = false;
-    }, 500);
-  }
-};
+import {
+  columns,
+  onSearch,
+  openJSONDialog,
+  onPageSizeChange,
+  onCurrentChange,
+  pagination,
+  reqlogs,
+  dataLoading
+} from "./index";
+
 onMounted(() => {
-  getOperatorLogDatas();
+  onSearch(1, pagination.value.pageSize);
 });
-
-function onPageSizeChange(value: number) {
-  getOperatorLogDatas(pagination.value.current, value);
-}
-
-function onCurrentChange(value: number) {
-  getOperatorLogDatas(value, pagination.value.pageSize);
-}
 </script>
 
 <template>

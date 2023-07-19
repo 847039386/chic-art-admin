@@ -137,7 +137,7 @@ function onChange({ row, index }) {
           onSearch()
           message(`${row.name} ${mst}成功，包括他的子集生效 ${result.data.matchedCount} 条`,{type:'success'})
         } else {
-          message(`${row.name} ${mst}失败：${result.message}`,{type:'error'})
+          message(`错误：${result.message}`,{type:'error'})
           row.available = !row.available
         }
         upAvailableLoading.value = false
@@ -158,11 +158,11 @@ export const handleDelete = async (row) => {
       onSearch()
       message(`${row.name} 删除成功，包括他的子集生效 ${result.data.deletedCount} 条`,{type:'success'})
     } else {
-      message(`${row.name} 删除失败：${result.message}`,{type:'error'})
+      message(`错误：${result.message}`,{type:'error'})
     }
   } catch (error) {
     delPermissionLoading.value = false
-    message(`${row.name} 删除失败：${error.message}`,{type:'error'})
+    message(`错误：${error.message}`,{type:'error'})
   }
 }
 
@@ -185,9 +185,18 @@ export const editPermission = async (action :string ,row?: any) => {
 
 
 export const onSearch = async () => {
-  dataLoading.value = true
-  const request = await httpPermissionAll() 
-  let newData = treeToList(addTreeAvailableIsDisabled(handleTree(request.data, '_id', 'parent_id')));
+  dataLoading.value = true;
+  let newData = [];
+  try {
+    const request = await httpPermissionAll()
+    if (request.success) {
+      newData = treeToList(addTreeAvailableIsDisabled(handleTree(request.data, '_id', 'parent_id')));
+    } else {
+      message(`错误：${request.message}`,{type:'error'});
+    }
+  } catch (error) {
+    message(`错误：${error.message}`,{type:'error'});
+  }
   
   if (!isAllEmpty(searchForm.name)) {
     // 前端搜索权限名称

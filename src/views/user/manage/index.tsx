@@ -1,10 +1,11 @@
 import { reactive, ref, watch } from "vue";
 import moment from "moment";
-import { ElMessageBox } from "element-plus";
+import { ElMessage, ElMessageBox, ElPopconfirm } from "element-plus";
 import { message } from "@/utils/message";
 import { isAllEmpty } from "@pureadmin/utils";
 import { httpUserAll } from "@/api/user";
 import { onAddToUserGroupFormClick } from "../form/user_group_user";
+import { httpUserGroupUserDel } from "@/api/user_group_user.api";
 // loading
 let dataLoading = ref(false);
 
@@ -52,10 +53,27 @@ export const columns: TableColumnList = [
     label: "用户组",
     align: "left",
     cellRenderer: ({ row }) => {
-      let group = [];
+      let group = []; 
       if (row.group.length > 0) {
         row.group.map((item) => {
-          group.push(<el-tag class="mx-1" size="small">{item.user_group.name}</el-tag>)
+          let type = item.user_group.available ? '' : 'info'
+          group.push(<el-tag class="mx-1" type={type} size="small" onClose={() => {
+            ElMessageBox.confirm('是否切断用户与该用户组之间的关联?','警告',{confirmButtonText: '确定',cancelButtonText: '取消',type: 'warning',})
+              .then(async () => {
+                try {
+                  let request = await httpUserGroupUserDel(item._id)
+                  if (request.success) {
+                    message(`成功：删除了改组与用户之间的关联`,{type:'success'})
+                    onSearch(1, pagination.value.pageSize);
+                  } else {
+                    message(`错误：${request.message}`,{type:'error'})
+                  }
+                } catch (error) {
+                  message(`错误：${error.message}`,{type:'error'})
+                }
+              })
+              .catch(() => {})
+          }} closable>{item.user_group.name}</el-tag>)
           return item
         })
         return <div>{group}</div>
@@ -95,17 +113,22 @@ export const onSearch = async (page?: number, limit?: number) => {
     match = Object.assign(match, { state: searchForm.state })
   }
 
-  const request = await httpUserAll(match)
-  if (request.success) {
-    newData = request.data.rows;
-    pagination = ref({
-      current: request.data.currentPage,
-      pageSize: request.data.pageSize,
-      total: request.data.total
-    });
-    console.log(pagination.value)
+  try {
+    const request = await httpUserAll(match)
+    if (request.success) {
+      newData = request.data.rows;
+      pagination = ref({
+        current: request.data.currentPage,
+        pageSize: request.data.pageSize,
+        total: request.data.total
+      });
+      console.log(pagination.value)
+    } else {
+      message(`错误：${request.message}`,{type:'error'});
+    }
+  } catch (error) {
+    message(`错误：${error.message}`,{type:'error'});
   }
-
 
   user_list.value = newData
   dataLoading.value = false

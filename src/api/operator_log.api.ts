@@ -3,12 +3,15 @@ import { baseUrlApi } from "./util"
 
 type Result = {
   success: boolean;
+  message: string;
+  code: string;
   data?: {
     /** 列表数据 */
     currentPage?: number
     pageSize?: number,
     total?: number,
-    rows?:[]
+    rows?: [],
+    
   };
 };
 

@@ -3,6 +3,7 @@ import { httpPermissionAll } from "@/api/permission.api";
 import { handleTree } from "@/utils/tree";
 import { httpRoleAll } from "@/api/role.api";
 import { httpUserGroupAll } from "@/api/user_group.api";
+import { message } from "@/utils/message";
 
 let permissionLoading = ref(false);
 let rolesLoading = ref(false);
@@ -27,10 +28,14 @@ export let user_group_list = ref([]);
 export const getPermissionDatas = async () => {
   try {
     permissionLoading.value = true;
-    let results = await httpPermissionAll();
-    permission_list.value = handleTree(results.data, "_id", "parent_id");
+    let request = await httpPermissionAll();
+    if (request.success) {
+      permission_list.value = handleTree(request.data, "_id", "parent_id");
+    } else {
+      message(`错误：${request.message}`,{type:'error'})
+    }
   } catch (e) {
-    console.log(e);
+    message(`错误：${e.message}`,{type:'error'})
   } finally {
     permissionLoading.value = false;
   }
@@ -39,10 +44,14 @@ export const getPermissionDatas = async () => {
 export const getRoleDatas = async () => {
   try {
     rolesLoading.value = true;
-    let results = await httpRoleAll();
-    role_list.value = handleTree(results.data, "_id", "parent_id");
+    let request = await httpRoleAll();
+    if (request.success) {
+      role_list.value = handleTree(request.data, "_id", "parent_id");
+    } else {
+      message(`错误：${request.message}`,{type:'error'})
+    }
   } catch (e) {
-    console.log(e);
+    message(`错误：${e.message}`,{type:'error'})
   } finally {
     rolesLoading.value = false;
   }
@@ -51,10 +60,14 @@ export const getRoleDatas = async () => {
 export const getUserGroupDatas = async () => {
   try {
     userGroupLoading.value = true;
-    let results = await httpUserGroupAll();
-    user_group_list.value = handleTree(results.data, "_id", "parent_id");
+    let request = await httpUserGroupAll();
+    if (request.success) {
+      user_group_list.value = handleTree(request.data, "_id", "parent_id");
+    } else {
+      message(`错误：${request.message}`,{type:'error'})
+    }
   } catch (e) {
-    console.log(e);
+    message(`错误：${e.message}`,{type:'error'})
   } finally {
     userGroupLoading.value = false;
   }

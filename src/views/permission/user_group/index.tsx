@@ -184,7 +184,7 @@ function onChange({ row, index }) {
           onSearch()
           message(`${row.name} ${mst}成功，包括他的子集生效 ${result.data.matchedCount} 条`,{type:'success'})
         } else {
-          message(`${row.name} ${mst}失败：${result.message}`,{type:'error'})
+          message(`错误：${result.message}`,{type:'error'})
           row.available = !row.available
         }
         upAvailableLoading.value = false
@@ -205,11 +205,11 @@ export const handleDelete = async (row) => {
       onSearch()
       message(`${row.name} 删除成功，包括他的子集生效 ${result.data.deletedCount} 条`,{type:'success'})
     } else {
-      message(`${row.name} 删除失败：${result.message}`,{type:'error'})
+      message(`错误：${result.message}`,{type:'error'})
     }
   } catch (error) {
     delUserGroupLoading.value = false
-    message(`${row.name} 删除失败：${error.message}`,{type:'error'})
+    message(`错误：${error.message}`,{type:'error'})
   }
 }
 
@@ -231,21 +231,29 @@ export const editUserGroup = async (action :string ,row?: any) => {
 
 export const onSearch = async () => {
   dataLoading.value = true
-  const request = await httpUserGroupAll() 
-
-  request.data = request.data.map((item) => {
-    if (!item.roles || item.roles[0].role.length == 0) {
-      item.roles = []
-    } else {
-      item.roles.map((ipss) => {
-        ipss.role = ipss.role[0]
-        return ipss
+  let newData = []
+  try {
+    const request = await httpUserGroupAll() 
+    if (request.success) {
+      request.data = request.data.map((item) => {
+        if (!item.roles || item.roles[0].role.length == 0) {
+          item.roles = []
+        } else {
+          item.roles.map((ipss) => {
+            ipss.role = ipss.role[0]
+            return ipss
+          })
+        }
+        return item
       })
+      newData = treeToList(addTreeAvailableIsDisabled(handleTree(request.data, '_id', 'parent_id')));
+    } else {
+      message(`错误：${request.message}`,{type:'error'});
     }
-    return item
-  })
-  
-  let newData = treeToList(addTreeAvailableIsDisabled(handleTree(request.data, '_id', 'parent_id')));
+  } catch (error) {
+    message(`错误：${error.message}`,{type:'error'});
+  }
+
 
   if (!isAllEmpty(searchForm.name)) {
     // 前端搜索权限名称
@@ -285,7 +293,7 @@ export const openDrawerSeleteRole = async (row) => {
     ing_selected_user_group.value = row
     drawerRoles.value = true
   } else {
-    message(`加载失败：${results.message}`,{type:'error'})
+    message(`错误：${results.message}`,{type:'error'})
   }
   loadingInstance.close()
 }
@@ -318,12 +326,12 @@ export const handleDeleteRole = async (row) => {
       user_group_roles.value = roles.data
       message(`删除成功`,{type:'success'})
     } else {
-      message(`删除失败：${result.message}`,{type:'error'})
+      message(`错误：${result.message}`,{type:'error'})
     }
     user_group_roles_loading.value = false
   } catch (error) {
     user_group_roles_loading.value = false
-    message(`删除失败：${error.message}`,{type:'error'})
+    message(`错误：${error.message}`,{type:'error'})
   }
 }
 

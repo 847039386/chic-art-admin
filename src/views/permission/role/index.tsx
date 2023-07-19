@@ -155,7 +155,7 @@ function onChange({ row, index }) {
         if (result.success) {
           message(`${row.name} ${mst}成功`,{type:'success'})
         } else {
-          message(`${row.name} ${mst}失败：${result.message}`,{type:'error'})
+          message(`错误：${result.message}`,{type:'error'})
           row.available = !row.available
         }
         switchLoadMap.value[index] = Object.assign({},switchLoadMap.value[index],{loading: false});
@@ -175,11 +175,11 @@ export const handleDelete = async (row) => {
       onSearch()
       message(`${row.name} 角色删除成功`,{type:'success'})
     } else {
-      message(`${row.name} 删除失败：${result.message}`,{type:'error'})
+      message(`错误：${result.message}`,{type:'error'})
     }
   } catch (error) {
     delRoleLoading.value = false
-    message(`${row.name} 删除失败：${error.message}`,{type:'error'})
+    message(`错误：${error.message}`,{type:'error'})
   }
 }
 
@@ -193,11 +193,11 @@ export const handleRolePermissionDelete = async (row) => {
       onSearch()
       message(`角色权限删除成功`,{type:'success'})
     } else {
-      message(`${row.name} 删除失败：${result.message}`,{type:'error'})
+      message(`错误：${result.message}`,{type:'error'})
     }
   } catch (error) {
     delRoleLoading.value = false
-    message(`${row.name} 删除失败：${error.message}`,{type:'error'})
+    message(`错误：${error.message}`,{type:'error'})
   }
 }
 
@@ -235,20 +235,33 @@ export const AddRolePermission = async (row: any) => {
 
 
 export const onSearch = async () => {
+
   dataLoading.value = true
-  const request = await httpRoleAll() 
-  let newData = request.data;
-  newData = newData.map((item) => {
-    if (!item.permissions || item.permissions[0].permission.length == 0) {
-      item.permissions = []
+  let newData = [];
+
+  try {
+    const request = await httpRoleAll()
+    if (request.success) {
+        newData = request.data.map((item) => {
+          if (!item.permissions || item.permissions[0].permission.length == 0) {
+            item.permissions = []
+          } else {
+            item.permissions.map((ipss) => {
+              ipss.permission = ipss.permission[0]
+              return ipss
+            })
+          }
+          return item
+        })
+
     } else {
-      item.permissions.map((ipss) => {
-        ipss.permission = ipss.permission[0]
-        return ipss
-      })
+      message(`错误：${request.message}`,{type:'error'});
     }
-    return item
-  })
+  } catch (error) {
+    message(`错误：${error.message}`,{type:'error'});
+  }
+
+
   if (!isAllEmpty(searchForm.name)) {
     // 前端搜索权限名称
     newData = newData.filter(item => item.name.includes(searchForm.name));
