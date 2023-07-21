@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { handleTree } from "@/utils/tree";
-import { httpPermissionAll } from "@/api/permission.api";
+import { ref } from "vue";
 import { formRules } from "./rule";
 
 // 声明 props 类型

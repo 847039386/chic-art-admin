@@ -2,9 +2,8 @@
 import { ref, onMounted } from "vue";
 import { PureTableBar } from "@/components/RePureTableBar";
 import {
-  user_list,
+  company_list,
   onSearch,
-  addToUserGroup,
   searchForm,
   resetForm,
   columns,
@@ -35,7 +34,7 @@ const formRef = ref();
       :model="searchForm"
       class="search-form bg-bg_color w-[99/100] pl-8 pt-[12px]"
     >
-      <el-form-item label="用户名称：" prop="name">
+      <el-form-item label="公司名称：" prop="name">
         <el-input
           v-model="searchForm.name"
           placeholder="请输入用户名称"
@@ -50,8 +49,9 @@ const formRef = ref();
           clearable
           class="!w-[180px]"
         >
-          <el-option label="正常" :value="0" />
-          <el-option label="封禁" :value="1" />
+          <el-option label="未审核" :value="0" />
+          <el-option label="正常" :value="1" />
+          <el-option label="封禁" :value="2" />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -69,7 +69,7 @@ const formRef = ref();
       </el-form-item>
     </el-form>
     <PureTableBar
-      title="用户管理"
+      title="公司管理"
       :columns="columns"
       :tableRef="tableRef?.getTableRef()"
       @refresh="onSearch"
@@ -88,7 +88,7 @@ const formRef = ref();
           :loading="loading"
           maxHeight="660"
           :size="size"
-          :data="user_list"
+          :data="company_list"
           :columns="dynamicColumns"
           :header-cell-style="{
             background: 'var(--el-table-row-hover-bg-color)',
@@ -102,7 +102,6 @@ const formRef = ref();
               type="primary"
               :size="size"
               :icon="useRenderIcon(Plus)"
-              @click="addToUserGroup(row)"
             >
               管理
             </el-button>

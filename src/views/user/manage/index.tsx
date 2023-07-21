@@ -1,11 +1,12 @@
-import { reactive, ref, watch } from "vue";
+import { reactive, ref, watch,h } from "vue";
 import moment from "moment";
-import { ElMessage, ElMessageBox, ElPopconfirm } from "element-plus";
+import { ElInput, ElText } from "element-plus";
 import { message } from "@/utils/message";
 import { isAllEmpty } from "@pureadmin/utils";
 import { httpUserAll } from "@/api/user";
 import { onAddToUserGroupFormClick } from "../form/user_group_user";
 import { httpUserGroupUserDel } from "@/api/user_group_user.api";
+import { addDialog ,closeDialog } from "@/components/ReDialog";
 // loading
 let dataLoading = ref(false);
 
@@ -58,21 +59,63 @@ export const columns: TableColumnList = [
         row.group.map((item) => {
           let type = item.user_group.available ? '' : 'info'
           group.push(<el-tag class="mx-1" type={type} size="small" onClose={() => {
-            ElMessageBox.confirm('是否切断用户与该用户组之间的关联?','警告',{confirmButtonText: '确定',cancelButtonText: '取消',type: 'warning',})
-              .then(async () => {
-                try {
-                  let request = await httpUserGroupUserDel(item._id)
-                  if (request.success) {
-                    message(`成功：删除了改组与用户之间的关联`,{type:'success'})
-                    onSearch(1, pagination.value.pageSize);
-                  } else {
-                    message(`错误：${request.message}`,{type:'error'})
-                  }
-                } catch (error) {
-                  message(`错误：${error.message}`,{type:'error'})
-                }
-              })
-              .catch(() => {})
+            let ipt = ref<string>();
+            let reuu_loading = ref<boolean>(false);
+            addDialog({
+              class:'ca_dialog_duu',
+              width: 420,
+              title: "警告",
+              alignCenter: true,
+              contentRenderer: () =>
+                h('p', null, [
+                  h('div', null, [
+                    h(ElText, null, { default: () => '是否切断' }),
+                    h(ElText, {class:'mx-1' ,type:"primary" ,tag: "b"}, { default: () => row.name }),
+                    h(ElText, null, { default: () => '与' }),
+                    h(ElText, { class: 'mx-1' ,type:"primary" ,tag: "b" }, { default: () => item.user_group.name }),
+                    h(ElText, null , { default: () => '之间的关联?' }),
+                  ]),
+                  h('div', {style: 'margin:10px 0px;' }, [
+                    h('span', null, '确认请输入:'),
+                    h('i', null, [h(ElText, { tag: "b", type: "danger", style: 'margin:0 10px;' }, { default: () => item._id })]),
+                  ]),
+                  h(ElInput, {
+                    modelValue: ipt.value,
+                    placeholder: '请输入码号',
+                    onInput: val => {
+                      ipt.value = val
+                    }
+                  })
+                ]),
+              footerRenderer: ({ options, index }) => (
+                <div>
+                  <el-button onClick={() => {
+                    closeDialog(options, index)
+                  }}>取消</el-button>
+                  <el-button loading={reuu_loading.value} type="primary" onClick={async () => {
+                      if (item._id == ipt.value) {
+                        try {
+                          reuu_loading.value = true
+                          let request = await httpUserGroupUserDel(item._id)
+                          if (request.success) {
+                            closeDialog(options, index)
+                            message(`成功：删除了改组与用户之间的关联`, { type: 'success' })
+                            onSearch(1, pagination.value.pageSize);
+                          } else {
+                            message(`错误：${request.message}`,{type:'error'})
+                          }
+                        } catch (error) {
+                          message(`错误：${error.message}`,{type:'error'})
+                        } finally {
+                          reuu_loading.value = false
+                        }
+                      } else {
+                        message(`错误：输入的验证码错误`,{type:'error'})
+                      }
+                  }}>确定</el-button>
+                </div>
+              )
+            })
           }} closable>{item.user_group.name}</el-tag>)
           return item
         })
@@ -122,7 +165,6 @@ export const onSearch = async (page?: number, limit?: number) => {
         pageSize: request.data.pageSize,
         total: request.data.total
       });
-      console.log(pagination.value)
     } else {
       message(`错误：${request.message}`,{type:'error'});
     }
