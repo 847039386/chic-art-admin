@@ -1,10 +1,9 @@
 
 
-import { h, createVNode, ref } from "vue";
-import { message } from "@/utils/message";
+import { ref } from "vue";
 import forms from "./index.vue";
 import { addDialog ,closeDialog } from "@/components/ReDialog";
-import { httpRoleAdd, httpRoleUpdate } from "@/api/role.api";
+import { httpCameraAdd ,httpCameraUpdate } from "@/api/camera.api";
 
 export interface AddRoleFormProps {
   formInline: {
@@ -15,19 +14,20 @@ export interface AddRoleFormProps {
 
 let loading = ref(false)
 
-export function onEditRoleFormClick(action :string ,data: any ,callback :Function) {
+export function onEditCameraFormClick(action :string ,data: any ,callback :Function) {
 
   let formInline;
   let title;
   if (action == 'ADD') {
-    title = '添加角色'
+    title = '创建摄像头'
     formInline = { }
   } else {
-    title = '修改角色'
+    title = '修改摄像头'
     formInline = {
       id :data._id,
       name: data.name,
-      description:data.description
+      iccid: data.iccid,
+      url:data.url
     }
   }
 
@@ -43,18 +43,18 @@ export function onEditRoleFormClick(action :string ,data: any ,callback :Functio
         <el-button onClick={() => {
           closeDialog(options, index)
         }}>取消</el-button>
-        <el-button loading={loading.value} type="primary" onClick={async () => {
+        <el-button type="primary" loading={loading.value} onClick={async () => {
           
           let result;
           try {
-            if (!formInline.name || !formInline.description) {
+            if (!formInline.name || !formInline.iccid || !formInline.url) {
               throw new Error('请正规的填写信息')
             }
             loading.value = true
             if (action == 'ADD') {
-              result = await httpRoleAdd(formInline);
+              result = await httpCameraAdd(formInline);
             } else {
-              result = await httpRoleUpdate(formInline);
+              result = await httpCameraUpdate(formInline);
             }
             loading.value = false
             if (!result.success) {

@@ -5,11 +5,11 @@ export default {
   },
   children: [
     {
-      path: "/company/tag",
-      name: "CompanyTag",
-      component: () => import("@/views/company/tag/index.vue"),
+      path: "/company/censor",
+      name: "CompanyCensor",
+      component: () => import("@/views/company/censor/index.vue"),
       meta: {
-        title: "标签管理"
+        title: "公司审核"
       }
     },
     {
@@ -18,14 +18,6 @@ export default {
       component: () => import("@/views/company/manage/index.vue"),
       meta: {
         title: "公司管理"
-      }
-    },
-    {
-      path: "/company/censor",
-      name: "CompanyCensor",
-      component: () => import("@/views/company/censor/index.vue"),
-      meta: {
-        title: "公司审核"
       }
     }
   ]

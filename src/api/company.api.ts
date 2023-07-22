@@ -25,17 +25,3 @@ export const httpCompanyCensorNotAllow = (id: string) => {
 };
 
 
-// export const httpCompanyAdd = (data?: object) => {
-//   return http.request<Result>("post", baseUrlApi(`company/add`),{data});
-// };
-
-// export const httpCompanyDel = (id: string) => {
-//   return http.request<Result>("delete", baseUrlApi('company/del'), { params: { id } });
-// };
-
-// export const httpCompanyUpdate = (data?: object) => {
-//   return http.request<Result>("patch", baseUrlApi(`company/up_info`),{data});
-// };
-
-
-

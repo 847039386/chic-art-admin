@@ -46,11 +46,11 @@ export const columns :TableColumnList = [
     {
       label: "权限名称",
       prop: "name",
-      width: 180,
       align: "left"
     },
     {
       label: "状态",
+      width: 100,
       cellRenderer: scope => {
         return <div>
           <el-switch
@@ -94,10 +94,13 @@ export const columns :TableColumnList = [
     {
       label: "权限码",
       prop: "code",
+      width: 300,
+      align: "left"
     },
     {
       label: "描述",
       prop: "description",
+      align: "left"
     },
     {
       label: "创建时间",

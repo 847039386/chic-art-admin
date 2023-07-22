@@ -37,6 +37,14 @@ export const searchForm = reactive({
 
 export const columns: TableColumnList = [
   {
+    label: "创办人",
+    width: 150,
+    align: "left",
+    cellRenderer: ({ row }) => {
+      return row.user_id.name
+    }
+  },
+  {
     label: "公司名称",
     prop: "name",
     align: "left"
@@ -50,7 +58,7 @@ export const columns: TableColumnList = [
       switch (row.censor) {
         case 0:
           type = 'success'
-          str = '正常'
+          str = '审核通过'
           break;
         case 1:
           type = 'warning'

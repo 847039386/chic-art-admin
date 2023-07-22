@@ -2,30 +2,22 @@
 import { ref, onMounted } from "vue";
 import { PureTableBar } from "@/components/RePureTableBar";
 import {
-  company_list,
+  camera_list,
   onSearch,
   searchForm,
   resetForm,
   columns,
   loading,
-  onPageSizeChange,
-  onCurrentChange,
   pagination,
-  drawerCompany,
-  openDrawerCompany,
-  company_camera_list,
-  closeDrawerCompany,
-  camera_columns,
-  company_camera_list_loading,
-  unAssignCamera,
-  current_company,
-  assignCameraToCompany
+  handleDelete,
+  editCamera
 } from "./index";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
-import Setting from "@iconify-icons/ep/setting";
-import Delete from "@iconify-icons/ep/delete";
+import EditPen from "@iconify-icons/ep/edit-pen";
+import Plus from "@iconify-icons/ep/Plus";
 import Search from "@iconify-icons/ep/search";
 import Refresh from "@iconify-icons/ep/refresh";
+import Delete from "@iconify-icons/ep/delete";
 
 onMounted(() => {
   onSearch();
@@ -43,10 +35,10 @@ const formRef = ref();
       :model="searchForm"
       class="search-form bg-bg_color w-[99/100] pl-8 pt-[12px]"
     >
-      <el-form-item label="公司名称：" prop="name">
+      <el-form-item label="摄像头名称：" prop="name">
         <el-input
           v-model="searchForm.name"
-          placeholder="请输入用户名称"
+          placeholder="请输入摄像头名称"
           clearable
           class="!w-[200px]"
         />
@@ -58,8 +50,9 @@ const formRef = ref();
           clearable
           class="!w-[180px]"
         >
-          <el-option label="正常" :value="0" />
-          <el-option label="封禁" :value="1" />
+          <el-option label="闲置" :value="0" />
+          <el-option label="工作" :value="1" />
+          <el-option label="空闲" :value="2" />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -77,11 +70,20 @@ const formRef = ref();
       </el-form-item>
     </el-form>
     <PureTableBar
-      title="公司管理"
+      title="摄像头管理"
       :columns="columns"
       :tableRef="tableRef?.getTableRef()"
-      @refresh="onSearch"
+      @refresh="onSearch(1, pagination.pageSize)"
     >
+      <template #buttons>
+        <el-button
+          type="primary"
+          :icon="useRenderIcon(Plus)"
+          @click="editCamera('ADD')"
+        >
+          添加摄像头
+        </el-button>
+      </template>
       <template v-slot="{ size, dynamicColumns }">
         <pure-table
           ref="tableRef"
@@ -96,7 +98,7 @@ const formRef = ref();
           :loading="loading"
           maxHeight="660"
           :size="size"
-          :data="company_list"
+          :data="camera_list"
           :columns="dynamicColumns"
           :header-cell-style="{
             background: 'var(--el-table-row-hover-bg-color)',
@@ -109,74 +111,31 @@ const formRef = ref();
               link
               type="primary"
               :size="size"
-              :icon="useRenderIcon(Setting)"
-              @click="openDrawerCompany(row)"
+              :icon="useRenderIcon(EditPen)"
+              @click="editCamera('UPDATE', row)"
             >
-              管理
+              修改
             </el-button>
-          </template>
-        </pure-table>
-        <el-pagination
-          class="ca_m_t10"
-          v-model:currentPage="pagination.current"
-          :page-size="pagination.pageSize"
-          :total="pagination.total"
-          :page-sizes="[20, 30, 40]"
-          :background="true"
-          layout="->,total, sizes, prev, pager, next, jumper"
-          @size-change="onPageSizeChange"
-          @current-change="onCurrentChange"
-        />
-      </template>
-    </PureTableBar>
-    <el-drawer
-      v-model="drawerCompany"
-      direction="rtl"
-      :before-close="closeDrawerCompany"
-    >
-      <template #header>
-        <h4>摄像头管理</h4>
-      </template>
-
-      <template #default>
-        <pure-table
-          :data="company_camera_list"
-          :columns="camera_columns"
-          :border="true"
-          row-key="_id"
-          showOverflowTooltip
-          :loading="company_camera_list_loading"
-        >
-          <template #operation="{ row }">
             <el-popconfirm
-              :title="`是否取消分配这个摄像头?`"
-              @confirm="unAssignCamera(row)"
+              :title="`是否确认删除摄像头：${row.name}`"
+              @confirm="handleDelete(row)"
             >
               <template #reference>
                 <el-button
                   class="reset-margin"
                   link
                   type="primary"
+                  :size="size"
                   :icon="useRenderIcon(Delete)"
                 >
-                  取消分配
+                  删除
                 </el-button>
               </template>
             </el-popconfirm>
           </template>
         </pure-table>
       </template>
-      <template #footer>
-        <div style="flex: auto">
-          <el-button @click="closeDrawerCompany">关闭</el-button>
-          <el-button
-            @click="assignCameraToCompany(current_company)"
-            type="primary"
-            >分配摄像头</el-button
-          >
-        </div>
-      </template>
-    </el-drawer>
+    </PureTableBar>
   </div>
 </template>
 
