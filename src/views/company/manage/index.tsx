@@ -46,7 +46,7 @@ export const columns: TableColumnList = [
     align: "left"
   },
   {
-    label: "标签组",
+    label: "标签",
     align: "left",
     cellRenderer: ({ row }) => {
       let tag = []; 
@@ -86,7 +86,6 @@ export const columns: TableColumnList = [
     align: "center",
     width: 140,
     formatter: ({ create_time }) => moment(create_time).format('YYYY-MM-DD HH:mm')
-    // cellRenderer: ({ row }) => row.system
   },
   {
     label: "操作",
@@ -119,6 +118,11 @@ export const camera_columns: TableColumnList = [
       }
       return <el-text class="mx-1" type={type}>{str}</el-text>
     }
+  },
+  {
+    label: "编号",
+    prop: "no",
+    width: 100,
   },
   {
     label: "名称",

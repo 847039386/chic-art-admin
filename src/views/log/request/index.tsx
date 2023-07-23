@@ -1,14 +1,15 @@
 import Bowser from "bowser";
 import moment from "moment";
 import { reactive ,ref } from "vue";
-import { httpRequestLogAll } from '@/api/request_log.api'
+import { httpClearedRequestLog, httpRequestLogAll } from '@/api/request_log.api'
 import { addDialog } from "@/components/ReDialog";
 import { message } from "@/utils/message";
 
 
-export let dataLoading = ref(false);
+export let dataLoading = ref<boolean>(false);
 export let reqlogs = ref([]);
 export let pagination = ref({ current: 1, pageSize: 20, total: 0 });
+export let clearedRequestLogLoading = ref<boolean>(false);
 
 export const onSearch = async (page: number, limit: number) => {
   try {
@@ -143,5 +144,22 @@ export const openJSONDialog = function (data) {
       hideFooter: true,
       contentRenderer: () => <json-viewer value={jsonData} copyable />
   });
+}
+
+export const clearedRequestLog = async () => {
+  try {
+    clearedRequestLogLoading.value = true;
+    let request = await httpClearedRequestLog();
+    if (request.success) {
+      message(`成功：清除请求日志`, { type: 'success' })
+      onSearch(1, pagination.value.pageSize);
+    } else {
+      throw new Error(request.message)
+    }
+  } catch (error) {
+    message(`失败：${error.message}`,{type:'error'})
+  } finally {
+    clearedRequestLogLoading.value = false;
+  }
 }
 

@@ -18,3 +18,7 @@ export const httpRequestLogAll = (page: number, limit: number) => {
   return http.request<Result>("get", baseUrlApi(`request-log/list`),{ params :{ page,limit } });
 };
 
+export const httpClearedRequestLog = () => {
+  return http.request<Result>("delete", baseUrlApi(`request-log/cleared`));
+};
+

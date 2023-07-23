@@ -2,13 +2,14 @@ import Bowser from "bowser";
 import moment from "moment";
 import { reactive ,ref } from "vue";
 import { addDialog } from "@/components/ReDialog";
-import { httpOperatorLogAll } from "@/api/operator_log.api";
+import { httpOperatorLogAll ,httpClearedOperatorLog } from "@/api/operator_log.api";
 import { message } from "@/utils/message";
 
 
-export let dataLoading = ref(false);
+export let dataLoading = ref<boolean>(false);
 export let reqlogs = ref([]);
 export let pagination = ref({ current: 1, pageSize: 20, total: 0 });
+export let clearedOperatorLogLoading = ref<boolean>(false)
 
 export const onSearch = async (page: number, limit: number) => {
   try {
@@ -145,12 +146,6 @@ export const columns: TableColumnList = [
     width: 150,
     cellRenderer: ({ row }) => row.system
   },
-  // {
-  //   label: "操作",
-  //   width: "120",
-  //   fixed: "right",
-  //   slot: "operation"
-  // }
 ];
 
 
@@ -164,3 +159,19 @@ export const openJSONDialog = function (data) {
   });
 }
 
+export const clearedOperatorLog = async () => {
+  try {
+    clearedOperatorLogLoading.value = true;
+    let request = await httpClearedOperatorLog();
+    if (request.success) {
+      message(`成功：清除操作日志`, { type: 'success' })
+      onSearch(1, pagination.value.pageSize);
+    } else {
+      throw new Error(request.message)
+    }
+  } catch (error) {
+    message(`失败：${error.message}`,{type:'error'})
+  } finally {
+    clearedOperatorLogLoading.value = false;
+  }
+}

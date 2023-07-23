@@ -27,7 +27,8 @@ export let pagination = ref({ current: 1, pageSize: 20, total: 0 });
 // 过滤
 export const searchForm = reactive({
   name: "",
-  state :null
+  state: null,
+  no:null
 });
 
 
@@ -36,6 +37,11 @@ export const columns: TableColumnList = [
     label: "ID",
     prop: "_id",
     width: 230,
+  },
+  {
+    label: "编号",
+    prop: "no",
+    width: 100,
   },
   {
     label: "状态",
@@ -63,7 +69,23 @@ export const columns: TableColumnList = [
   {
     label: "摄像头",
     prop: "name",
-    align: "left"
+    align: "left",
+    width: 200,
+  },
+  {
+    label: "所属公司",
+    align: "left",
+    cellRenderer: ({ row }) => {
+      let type = 'info'
+      let company_id = row.company_id
+      let company_name = '未分配';
+      if (company_id) {
+        type=""
+        company_name = row.company_id.name
+      }
+      
+      return <el-text class="mx-1" type={type}>{company_name}</el-text>
+    }
   },
   {
     label: "创建时间",
@@ -90,11 +112,14 @@ export const onSearch = async (page?: number, limit?: number) => {
   if (searchForm.name) {
     match = Object.assign(match, { name: searchForm.name })
   }
-
-  if (typeof searchForm.state != 'undefined' && searchForm.state != null &&  searchForm.state != "") {
+  if (typeof searchForm.state != 'undefined' && searchForm.state != null && searchForm.state !== "") {
+    console.log('进来了')
     match = Object.assign(match, { state: searchForm.state })
   }
 
+  if (typeof searchForm.no != 'undefined' && searchForm.no != null &&  searchForm.no != "") {
+    match = Object.assign(match, { no: searchForm.no })
+  }
   try {
     const request = await httpCameraAll(match)
     if (request.success) {

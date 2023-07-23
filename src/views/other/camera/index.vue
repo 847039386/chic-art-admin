@@ -35,6 +35,15 @@ const formRef = ref();
       :model="searchForm"
       class="search-form bg-bg_color w-[99/100] pl-8 pt-[12px]"
     >
+      <el-form-item label="编号：" prop="no">
+        <el-input
+          type="number"
+          v-model="searchForm.no"
+          placeholder="请输入摄像头编号"
+          clearable
+          class="!w-[200px]"
+        />
+      </el-form-item>
       <el-form-item label="摄像头名称：" prop="name">
         <el-input
           v-model="searchForm.name"

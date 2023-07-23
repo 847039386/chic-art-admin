@@ -63,7 +63,7 @@ const newFormInline = ref(props.formInline);
         placeholder="请选择摄像头"
       >
         <template #default="{ node, data }">
-          <span>{{ data.name }}</span>
+          <span>{{ `${data.no}：${data.name}` }}</span>
           <span v-if="!node.isLeaf"> ({{ data.children.length }}) </span>
         </template>
       </el-cascader>

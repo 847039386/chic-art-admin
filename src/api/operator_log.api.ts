@@ -19,3 +19,9 @@ export const httpOperatorLogAll = (page: number, limit: number) => {
   return http.request<Result>("get", baseUrlApi(`operator-log/list?page=${page}&limit=${limit}`));
 };
 
+export const httpClearedOperatorLog = () => {
+  return http.request<Result>("delete", baseUrlApi(`operator-log/cleared`));
+};
+
+
+
