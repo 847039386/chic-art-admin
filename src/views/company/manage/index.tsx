@@ -1,4 +1,4 @@
-import { reactive, ref, watch,h } from "vue";
+import { reactive, ref, watch, h } from "vue";
 import moment from "moment";
 import { message } from "@/utils/message";
 import { httpCompanyAll } from "@/api/company.api";
@@ -37,7 +37,7 @@ export const columns: TableColumnList = [
     width: 150,
     align: "left",
     cellRenderer: ({ row }) => {
-      return row.user_id.name
+      return row.user_id.name ? row.user_id.name : row.user_id.nickname
     }
   },
   {
@@ -49,7 +49,7 @@ export const columns: TableColumnList = [
     label: "标签",
     align: "left",
     cellRenderer: ({ row }) => {
-      let tag = []; 
+      let tag = [];
       if (row.tag_ids.length > 0) {
         row.tag_ids.map((item) => {
           tag.push(<el-tag class="mx-1" size="small">{item.name}</el-tag>)
@@ -145,8 +145,8 @@ export const onSearch = async (page?: number, limit?: number) => {
   let newData = []
   page = page || 1;
   limit = limit || 20
-  let match = { page, limit ,censor:0}
-  
+  let match = { page, limit, censor: 0 }
+
   if (searchForm.name) {
     match = Object.assign(match, { name: searchForm.name })
   }
@@ -165,10 +165,10 @@ export const onSearch = async (page?: number, limit?: number) => {
         total: request.data.total
       });
     } else {
-      message(`错误：${request.message}`,{type:'error'});
+      message(`错误：${request.message}`, { type: 'error' });
     }
   } catch (error) {
-    message(`错误：${error.message}`,{type:'error'});
+    message(`错误：${error.message}`, { type: 'error' });
   }
 
   company_list.value = newData
@@ -224,7 +224,7 @@ export const openDrawerCompany = async (row: any) => {
     current_company.value = row;
   } catch (error) {
     drawerCompany.value = false;
-    message(`错误：${error.message}`,{type:'error'});
+    message(`错误：${error.message}`, { type: 'error' });
   }
 }
 
@@ -235,12 +235,12 @@ export const closeDrawerCompany = () => {
 }
 
 export const assignCameraToCompany = async (row) => {
-  onAssignCameraFormClick(row ,async (err, results) => {
-      if (!err) {
-        await getCamerasByCompanyId(current_company.value._id);
-      } else {
-        message(`错误： ${err.message}`,{type:'error'});
-      }
+  onAssignCameraFormClick(row, async (err, results) => {
+    if (!err) {
+      await getCamerasByCompanyId(current_company.value._id);
+    } else {
+      message(`错误： ${err.message}`, { type: 'error' });
+    }
   });
 };
 
@@ -248,15 +248,15 @@ export const assignCameraToCompany = async (row) => {
 export const unAssignCamera = async (row) => {
   try {
     company_camera_list_loading.value = true;
-    let request = await httpUnAssignCompany({id :row._id})
+    let request = await httpUnAssignCompany({ id: row._id })
     if (request.success) {
-      message(`成功：分配成功`,{type:'success'});
+      message(`成功：分配成功`, { type: 'success' });
       await getCamerasByCompanyId(current_company.value._id);
     } else {
-      message(`错误：${request.message}`,{type:'error'});
+      message(`错误：${request.message}`, { type: 'error' });
     }
   } catch (error) {
-    message(`错误：${error.message}`,{type:'error'});
+    message(`错误：${error.message}`, { type: 'error' });
   } finally {
     company_camera_list_loading.value = false;
   }
