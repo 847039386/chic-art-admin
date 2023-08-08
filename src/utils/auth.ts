@@ -9,8 +9,10 @@ export interface DataInfo<T> {
   expires: T;
   /** 用于调用刷新accessToken的接口时所需的token */
   refreshToken: string;
-  /** 用户名 */
-  username?: string;
+  /** 真实姓名 */
+  name?: string;
+  /** 昵称 */
+  nickname?: string;
   /** 当前登陆用户的角色 */
   roles?: Array<string>;
   /** 头像 */
@@ -50,30 +52,33 @@ export function setToken(data: DataInfo<Date>) {
       })
     : Cookies.set(TokenKey, cookieString);
 
-  function setSessionKey(username: string, roles: Array<string>, avatar: string) {
-    useUserStoreHook().SET_USERNAME(username);
+  function setSessionKey(name: string, nickname: string, roles: Array<string>, avatar: string) {
+    useUserStoreHook().SET_USERNAME(name);
+    useUserStoreHook().SET_NICKNAME(nickname);
     useUserStoreHook().SET_ROLES(roles);
     useUserStoreHook().SET_AVATAR(avatar);
     storageSession().setItem(sessionKey, {
       refreshToken,
       expires,
-      username,
+      avatar,
+      name,
+      nickname,
       roles
     });
   }
-
   // data.roles 这里以后做权限
-  if (data.username) {
-    const { username, roles } = data;
-    setSessionKey(username, roles ,data.avatar);
+  if (data && (data.name || data.nickname)) {
+    setSessionKey(data.name ,data.nickname, data.roles ,data.avatar);
   } else {
-    const username =
-      storageSession().getItem<DataInfo<number>>(sessionKey)?.username ?? "";
+    const name =
+      storageSession().getItem<DataInfo<number>>(sessionKey)?.name ?? "";
+    const nickname =
+      storageSession().getItem<DataInfo<number>>(sessionKey)?.nickname ?? "";
     const roles =
       storageSession().getItem<DataInfo<number>>(sessionKey)?.roles ?? [];
     const avatar =
       storageSession().getItem<DataInfo<number>>(sessionKey)?.avatar ?? "";
-    setSessionKey(username, roles,avatar);
+    setSessionKey(name ,nickname, roles,avatar);
   }
 }
 

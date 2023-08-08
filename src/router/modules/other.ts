@@ -19,6 +19,15 @@ export default {
       meta: {
         title: "摄像头管理"
       }
-    }
+    },
+    {
+      path: "/other/progress_template",
+      name: "OtherProgressTemplate",
+      component: () => import("@/views/other/progress_template/index.vue"),
+      meta: {
+        title: "进度模板管理"
+      }
+    },
+    
   ]
 };

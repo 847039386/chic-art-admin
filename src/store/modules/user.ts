@@ -13,15 +13,19 @@ export const useUserStore = defineStore({
   id: "pure-user",
   state: (): userType => ({
     // 用户名
-    username: storageSession().getItem<DataInfo<number>>(sessionKey)?.username ?? "",
+    name: storageSession().getItem<DataInfo<number>>(sessionKey)?.name ?? "",
+    nickname: storageSession().getItem<DataInfo<number>>(sessionKey)?.nickname ?? "",
     // 页面级别权限
     roles: storageSession().getItem<DataInfo<number>>(sessionKey)?.roles ?? [],
     avatar: storageSession().getItem<DataInfo<number>>(sessionKey)?.avatar ?? "",
   }),
   actions: {
     /** 存储用户名 */
-    SET_USERNAME(username: string) {
-      this.username = username;
+    SET_USERNAME(name: string) {
+      this.name = name;
+    },
+    SET_NICKNAME(nickname :string) {
+      this.nickname = nickname;
     },
     /** 存储角色 */
     SET_ROLES(roles: Array<string>) {
@@ -35,12 +39,12 @@ export const useUserStore = defineStore({
     async loginByUsername(data) {
       return new Promise<UserResult>((resolve, reject) => {
         getLogin(data)
-          .then(data => {
-            if (data && data.success) {
-              setToken(data.data);
-              resolve(data);
+          .then(result => {
+            if (result && result.success) {
+              setToken(result.data);
+              resolve(result);
             } else {
-              reject(data)
+              reject(result)
             }
           })
           .catch(error => {
@@ -50,7 +54,8 @@ export const useUserStore = defineStore({
     },
     /** 前端登出（不调用接口） */
     logOut() {
-      this.username = "";
+      this.name = "";
+      this.nickname = "";
       this.roles = [];
       removeToken();
       useMultiTagsStoreHook().handleTags("equal", [...routerArrays]);

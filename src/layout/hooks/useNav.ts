@@ -34,7 +34,8 @@ export function useNav() {
 
   /** 用户名 */
   const username = computed(() => {
-    return useUserStoreHook()?.username;
+    // 如果有真实姓名显示真实姓名 否则显示昵称
+    return useUserStoreHook()?.name || useUserStoreHook()?.nickname;
   });
 
   /** 头像 */
