@@ -59,7 +59,9 @@ export const columns: TableColumnList = [
   {
     label: "操作人",
     width: 100,
-    cellRenderer: ({ row }) => row.user_id.name
+    cellRenderer: ({ row }) => {
+      return <el-text >{ row.user_id.name || row.user_id.nickname}</el-text>
+    }
   },
   {
     label: "请求",
