@@ -88,6 +88,11 @@ export const columns: TableColumnList = [
     }
   },
   {
+    label: "地址",
+    prop: "url",
+    align: "left",
+  },
+  {
     label: "创建时间",
     align: "center",
     width: 140,
