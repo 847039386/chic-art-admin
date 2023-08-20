@@ -1,7 +1,7 @@
 import { reactive, ref, watch,h } from "vue";
 import moment from "moment";
 import { message } from "@/utils/message";
-import { httpCameraAll, httpCameraDel } from "@/api/camera.api";
+import { httpCameraDel ,httpCompanyCameraAll } from "@/api/camera.api";
 import { onEditCameraFormClick } from "../form/camera";
 // loading
 let dataLoading = ref(false);
@@ -26,22 +26,36 @@ export let pagination = ref({ current: 1, pageSize: 20, total: 0 });
 
 // 过滤
 export const searchForm = reactive({
-  name: "",
   state: null,
   no:null
 });
 
 
 export const columns: TableColumnList = [
-  {
-    label: "ID",
-    prop: "_id",
-    width: 230,
-  },
+  // {
+  //   label: "ID",
+  //   prop: "_id",
+  //   width: 230,
+  // },
   {
     label: "编号",
     prop: "no",
     width: 100,
+  },
+  {
+    label: "所属公司",
+    width: 150,
+    align: "left",
+    cellRenderer: ({ row }) => {
+      let type = ''
+      let company_name = '未分配';
+      if (row.company_camera && row.company_camera.company_id) {
+        company_name = row.company_camera.company_id.name || '无名'
+      } else {
+        type = "info"
+      }
+      return <el-text  class="mx-1" type={type}>{company_name}</el-text>
+    }
   },
   {
     label: "状态",
@@ -73,21 +87,6 @@ export const columns: TableColumnList = [
     width: 200,
   },
   {
-    label: "所属公司",
-    align: "left",
-    cellRenderer: ({ row }) => {
-      let type = 'info'
-      let company_id = row.company_id
-      let company_name = '未分配';
-      if (company_id) {
-        type=""
-        company_name = row.company_id.name
-      }
-      
-      return <el-text class="mx-1" type={type}>{company_name}</el-text>
-    }
-  },
-  {
     label: "地址",
     prop: "url",
     align: "left",
@@ -114,9 +113,6 @@ export const onSearch = async (page?: number, limit?: number) => {
   limit = limit || 20
   let match = { page, limit }
   
-  if (searchForm.name) {
-    match = Object.assign(match, { name: searchForm.name })
-  }
   if (typeof searchForm.state != 'undefined' && searchForm.state != null && searchForm.state !== "") {
     console.log('进来了')
     match = Object.assign(match, { state: searchForm.state })
@@ -125,8 +121,9 @@ export const onSearch = async (page?: number, limit?: number) => {
   if (typeof searchForm.no != 'undefined' && searchForm.no != null &&  searchForm.no != "") {
     match = Object.assign(match, { no: searchForm.no })
   }
+
   try {
-    const request = await httpCameraAll(match)
+    const request = await httpCompanyCameraAll(match)
     if (request.success) {
       newData = request.data.rows;
       pagination = ref({

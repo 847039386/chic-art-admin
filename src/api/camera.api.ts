@@ -24,15 +24,8 @@ export const httpCameraUpdate = (data?: object) => {
   return http.request<Result>("patch", baseUrlApi(`camera/up_info`),{data});
 };
 
-export const httpAssignCompany = (data?: object) => {
-  return http.request<Result>("patch", baseUrlApi(`camera/assign_company`),{data});
-};
-export const httpUnAssignCompany = (data?: object) => {
-  return http.request<Result>("patch", baseUrlApi(`camera/unassign_company`),{data});
-};
-
-export const httpCompanyCameras = (company_id?: string) => {
-  return http.request<Result>("get", baseUrlApi(`camera/company`), { params: { company_id } });
+export const httpCompanyCameraAll = (data) => {
+  return http.request<Result>("post", baseUrlApi(`camera/clist`), { data  });
 };
 
 

@@ -44,14 +44,6 @@ const formRef = ref();
           class="!w-[200px]"
         />
       </el-form-item>
-      <el-form-item label="摄像头名称：" prop="name">
-        <el-input
-          v-model="searchForm.name"
-          placeholder="请输入摄像头名称"
-          clearable
-          class="!w-[200px]"
-        />
-      </el-form-item>
       <el-form-item label="状态：" prop="state">
         <el-select
           v-model="searchForm.state"

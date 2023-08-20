@@ -47,9 +47,9 @@ const formRef = ref();
           class="!w-[200px]"
         />
       </el-form-item>
-      <el-form-item label="审核状态：" prop="censor">
+      <el-form-item label="审核状态：" prop="audit_state">
         <el-select
-          v-model="searchForm.censor"
+          v-model="searchForm.audit_state"
           placeholder="请选择审核状态"
           class="!w-[180px]"
         >
@@ -110,7 +110,7 @@ const formRef = ref();
               通过
             </el-button>
             <el-button
-              v-show="row.censor == 1"
+              v-show="row.audit_state == 1"
               class="reset-margin"
               link
               type="primary"

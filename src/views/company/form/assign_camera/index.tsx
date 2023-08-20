@@ -3,7 +3,8 @@
 import { ref } from "vue";
 import forms from "./index.vue";
 import { addDialog ,closeDialog } from "@/components/ReDialog";
-import { httpAssignCompany, httpCameraAdd ,httpCameraAll,httpCameraUpdate, httpCompanyCameras } from "@/api/camera.api";
+import { httpCameraAll } from "@/api/camera.api";
+import { httpCompanyCameraAdd } from "@/api/company_camera.api";
 import { ElLoading } from "element-plus";
 
 let loading = ref(false)
@@ -51,9 +52,11 @@ export const onAssignCameraFormClick = async (data: any ,callback :Function) => 
               if (!formInline.name || !formInline.company_id || !formInline.camera_id) {
                 throw new Error('请正规的填写信息')
               }
-              console.log(formInline)
               loading.value = true
-              result = await httpAssignCompany({ id :formInline.camera_id , company_id :formInline.company_id});
+              result = await httpCompanyCameraAdd({
+                camera_id: formInline.camera_id,
+                company_id: formInline.company_id
+              });
               if (!result.success) {
                 throw new Error(result.message)
               } else {

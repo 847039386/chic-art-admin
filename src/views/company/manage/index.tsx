@@ -2,7 +2,7 @@ import { reactive, ref, watch, h } from "vue";
 import moment from "moment";
 import { message } from "@/utils/message";
 import { httpCompanyAll } from "@/api/company.api";
-import { httpAssignCompany, httpCompanyCameras, httpUnAssignCompany } from "@/api/camera.api";
+import { httpCamerasByCompany ,httpUnAssignCompany } from "@/api/company_camera.api"
 import { onAssignCameraFormClick } from "../form/assign_camera";
 import { ElLoading } from "element-plus";
 
@@ -121,14 +121,16 @@ export const camera_columns: TableColumnList = [
   },
   {
     label: "编号",
-    prop: "no",
     width: 100,
+    cellRenderer: ({ row }) => {
+      return row.camera_id.no || 0 
+    }
   },
   {
     label: "名称",
     align: "left",
     cellRenderer: ({ row }) => {
-      return row.name
+      return row.camera_id.name || '无名' 
     }
   },
   {
@@ -200,12 +202,13 @@ export let company_camera_list = ref([])
 let getCamerasByCompanyId = async (id: string) => {
   try {
     company_camera_list_loading.value = true;
-    let request = await httpCompanyCameras(id)
+    let request = await httpCamerasByCompany(id)
+    console.log(request)
     if (request.success) {
-      company_camera_list.value = request.data;
+      company_camera_list.value = request.data.rows;
       // current_company.value = row;
       // drawerCompany.value = true;
-      console.log(request.data)
+      console.log(request.data.rows)
     } else {
       throw new Error(request.message)
     }
@@ -248,9 +251,9 @@ export const assignCameraToCompany = async (row) => {
 export const unAssignCamera = async (row) => {
   try {
     company_camera_list_loading.value = true;
-    let request = await httpUnAssignCompany({ id: row._id })
+    let request = await httpUnAssignCompany(row._id)
     if (request.success) {
-      message(`成功：分配成功`, { type: 'success' });
+      message(`成功：取消分配`, { type: 'success' });
       await getCamerasByCompanyId(current_company.value._id);
     } else {
       message(`错误：${request.message}`, { type: 'error' });

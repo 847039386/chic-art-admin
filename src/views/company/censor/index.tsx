@@ -31,7 +31,7 @@ export let pagination = ref({ current: 1, pageSize: 20, total: 0 });
 // 过滤
 export const searchForm = reactive({
   name: "",
-  censor: 1,
+  audit_state: 1,
 });
 
 
@@ -41,7 +41,7 @@ export const columns: TableColumnList = [
     width: 150,
     align: "left",
     cellRenderer: ({ row }) => {
-      return row.user_id.name
+      return row.user_id.name || row.user_id.nickname
     }
   },
   {
@@ -55,7 +55,7 @@ export const columns: TableColumnList = [
     cellRenderer: ({ row }) => {
       let str = '';
       let type = '';
-      switch (row.censor) {
+      switch (row.audit_state) {
         case 0:
           type = 'success'
           str = '审核通过'
@@ -99,8 +99,8 @@ export const onSearch = async (page?: number, limit?: number) => {
     match = Object.assign(match, { name: searchForm.name })
   }
 
-  if (typeof searchForm.censor != 'undefined' && searchForm.censor != null) {
-    match = Object.assign(match, { censor: searchForm.censor })
+  if (typeof searchForm.audit_state != 'undefined' && searchForm.audit_state != null) {
+    match = Object.assign(match, { audit_state: searchForm.audit_state })
   }
 
   try {
