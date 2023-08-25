@@ -65,12 +65,12 @@ export const columns: TableColumnList = [
       let type = '';
       switch (row.state) {
         case 0:
-          type = 'primary'
-          str = '闲置'
+          type = 'info'
+          str = '未分配'
           break;
         case 1:
-          type = 'success'
-          str = '工作'
+          type = 'primary'
+          str = '已分配'
           break;
         default:
           type = 'info'

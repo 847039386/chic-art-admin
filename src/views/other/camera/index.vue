@@ -51,9 +51,8 @@ const formRef = ref();
           clearable
           class="!w-[180px]"
         >
-          <el-option label="闲置" :value="0" />
-          <el-option label="工作" :value="1" />
-          <el-option label="空闲" :value="2" />
+          <el-option label="未分配" :value="0" />
+          <el-option label="已分配" :value="1" />
         </el-select>
       </el-form-item>
       <el-form-item>

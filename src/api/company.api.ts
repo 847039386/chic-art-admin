@@ -13,15 +13,16 @@ export const httpCompanyAll = (data :object) => {
 };
 
 export const httpCompanyCensorList = (data :object) => {
-  return http.request<Result>("post", baseUrlApi(`company/censor_list`), { data });
+  return http.request<Result>("post", baseUrlApi(`company/list_audit_allow`), { data });
 };
 
 export const httpCompanyCensorAllow = (id: string) => {
-  return http.request<Result>("patch", baseUrlApi(`company/up_censor_allow`), { params: { id } });
+  return http.request<Result>("patch", baseUrlApi(`company/up_audit_allow`), { params: { id } });
 };
 
 export const httpCompanyCensorNotAllow = (id: string) => {
-  return http.request<Result>("patch", baseUrlApi(`company/up_censor_not_allow`), { params: { id } });
+  return http.request<Result>("patch", baseUrlApi(`company/up_audit_not_allow`), { params: { id } });
 };
 
 
+ 
