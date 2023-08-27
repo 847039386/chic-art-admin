@@ -19,6 +19,7 @@ import {
   company_camera_list_loading,
   unAssignCamera,
   current_company,
+  setDuration,
   assignCameraToCompany
 } from "./index";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
@@ -26,6 +27,7 @@ import Setting from "@iconify-icons/ep/setting";
 import Delete from "@iconify-icons/ep/delete";
 import Search from "@iconify-icons/ep/search";
 import Refresh from "@iconify-icons/ep/refresh";
+import Timer from "@iconify-icons/ep/timer";
 
 onMounted(() => {
   onSearch();
@@ -132,6 +134,7 @@ const formRef = ref();
     <el-drawer
       v-model="drawerCompany"
       direction="rtl"
+      size="800"
       :before-close="closeDrawerCompany"
     >
       <template #header>
@@ -148,6 +151,14 @@ const formRef = ref();
           :loading="company_camera_list_loading"
         >
           <template #operation="{ row }">
+            <el-button
+              class="reset-margin"
+              type="primary"
+              @click="setDuration(row)"
+              :icon="useRenderIcon(Timer)"
+            >
+              续时
+            </el-button>
             <el-popconfirm
               :title="`是否取消分配这个摄像头?`"
               @confirm="unAssignCamera(row)"

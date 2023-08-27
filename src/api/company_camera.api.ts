@@ -22,3 +22,7 @@ export const httpCamerasByCompany = (company_id :string ,page ?:number, limit ?:
 export const httpUnAssignCompany = (id: string) => {
   return http.request<Result>("delete", baseUrlApi('company-camera/del'), { params: { id } });
 };
+
+export const httpUpdateExpireTime = (id: string ,expire_time :string) => {
+  return http.request<Result>("patch", baseUrlApi('company-camera/up_expire_time'), { data: { id ,expire_time } });
+};

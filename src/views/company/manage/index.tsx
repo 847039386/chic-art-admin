@@ -1,10 +1,11 @@
 import { reactive, ref, watch, h } from "vue";
 import moment from "moment";
+import { dayjs } from 'element-plus';
 import { message } from "@/utils/message";
 import { httpCompanyAll } from "@/api/company.api";
 import { httpCamerasByCompany ,httpUnAssignCompany } from "@/api/company_camera.api"
 import { onAssignCameraFormClick } from "../form/assign_camera";
-import { ElLoading } from "element-plus";
+import { onDurationCompanyCameraFormClick } from "../form/duration_company_camera";
 
 // loading
 let dataLoading = ref(false);
@@ -134,8 +135,34 @@ export const camera_columns: TableColumnList = [
     }
   },
   {
+    label: "到期时间",
+    align: "left",
+    cellRenderer: ({ row }) => {
+      let today = dayjs();
+      let expire_time = dayjs(row.expire_time)
+      let diff = expire_time.diff(today, 'day', true);
+      let type =''
+      let diff_str = ''
+      if(diff >= 7){
+        type = 'success'
+        diff_str = `${expire_time.diff(today,'day')}天`
+      }else if(diff >= 1){
+        type = 'warning'
+        diff_str = `${expire_time.diff(today,'day')}天`
+      }else if(diff< 1 && diff > 0){
+        let hour = expire_time.diff(today,'hour',true).toFixed(1);
+        type = 'warning'
+        diff_str = `${hour}小时`
+      }else{
+        type = 'danger'
+        diff_str = `已过期`
+      }
+      return <el-text class="mx-1" type={type}>{diff_str}</el-text>
+    }
+  },
+  {
     label: "操作",
-    width: 120,
+    width: 240,
     fixed: "right",
     slot: "operation"
   }
@@ -246,6 +273,16 @@ export const assignCameraToCompany = async (row) => {
     }
   });
 };
+
+export const setDuration = async (row) => {
+  onDurationCompanyCameraFormClick(row, async (err, results) => {
+    if (!err) {
+      await getCamerasByCompanyId(current_company.value._id);
+    } else {
+      message(`错误： ${err.message}`, { type: 'error' });
+    }
+  });
+}
 
 
 export const unAssignCamera = async (row) => {
